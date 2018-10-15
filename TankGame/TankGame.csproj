@@ -71,7 +71,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="Cls3DAxis.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
