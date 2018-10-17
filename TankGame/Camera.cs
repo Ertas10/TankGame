@@ -19,16 +19,16 @@ namespace TankGame
         float pitch;
         GraphicsDevice graphicsDevice;
         float escalaRadianosPorPixel;
-        Terrain terreno;
+        ClsPlaneTextureIndexStripVB terreno;
 
-        public Camera(GraphicsDevice graphicsDevice, Terrain terreno){
-            pos = new Vector3(1, 1, 2);
+        public Camera(GraphicsDevice graphicsDevice, ClsPlaneTextureIndexStripVB terreno){
+            pos = new Vector3(1, 120, 2);
             target = -Vector3.UnitZ;
             yaw = 0;
             pitch = 0;
             viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);
             this.graphicsDevice = graphicsDevice;
-            escalaRadianosPorPixel = (float)Math.PI / 500f;
+            escalaRadianosPorPixel = (float)Math.PI / 1000f;
             Mouse.SetPosition(this.graphicsDevice.Viewport.Width / 2, this.graphicsDevice.Viewport.Height / 2);
             this.terreno = terreno;
         }
@@ -42,13 +42,13 @@ namespace TankGame
             int deltaY = mouse.Y - centroY;
             yaw = yaw - deltaX * escalaRadianosPorPixel;
             pitch = pitch - deltaY * escalaRadianosPorPixel;
-
+            pitch = MathHelper.Clamp(pitch, -1, 1);
             Matrix rotacao = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
 
             Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotacao);
 
             Vector3 right = Vector3.Cross(dir, Vector3.Up);
-            float speed = 1;
+            float speed = 5;
             if(keyboard.IsKeyDown(Keys.W)){
                 pos = pos + dir * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
@@ -61,11 +61,31 @@ namespace TankGame
             if(keyboard.IsKeyDown(Keys.D)){
                 pos = pos + right * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
+
+            if (pos.X < terreno.vertices[0].Position.X)
+                pos.X = terreno.vertices[0].Position.X;
+            if (pos.Z < terreno.vertices[0].Position.Z)
+                pos.Z = terreno.vertices[0].Position.Z;
+            if (pos.X > terreno.vertices[terreno.vertices.Length - 1].Position.X)
+                pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 1;
+            if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.X)
+                pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 1;
+
+            Vector3[] vectors = terreno.GetYFromXZ((int)pos.X, (int)pos.Z);
+
+            float YA = vectors[0].Y;
+            float YB = vectors[1].Y;
+            float YC = vectors[2].Y;
+            float YD = vectors[3].Y;
+
+            float YAB = ((((int)pos.X + 1) - pos.X) * YA + (pos.X - (int)pos.X) * YB);
+            float YCD = ((((int)pos.X + 1) - pos.X) * YC + (pos.X - (int)pos.X) * YD);
+
+            pos.Y =  ((((int)pos.Z + 1) - pos.Z) * YAB + (((int)pos.Z + 1) - pos.Z) * YCD) + 0.5f;
+            Debug.Print("YA: " + YA + ";YB: " + YB + ";YC: " + YC + ";YD: " + YD + ";YAB: " + YAB + ";YCD: " + YCD + ";pos.Y: " + pos.Y + ";X: " + pos.X + ";Z: " + pos.Z);
             target = pos + dir;
 
             viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);
-
-            Debug.Print("PosX: " + pos.X + "; PosY: " + pos.Y + "\n");
 
             Mouse.SetPosition(centroX, centroY);
         }
