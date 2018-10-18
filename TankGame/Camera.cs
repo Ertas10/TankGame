@@ -83,8 +83,8 @@ namespace TankGame
             float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);
 
             pos.Y =  ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) + 2f;
-            Debug.Print("AX: " + vectors[0].X + "\nBX: " + vectors[1].X + "\nPosX: " + pos.X);
-            Debug.Print("AZ: " + vectors[0].Z + "\nBZ: " + vectors[1].Z + "\nPosZ: " + pos.Z);            //Debug.Print("AZ: " + vectors[0].Z + "\nBZ: " + vectors[1].Z);
+            //Debug.Print("AX: " + vectors[0].X + "\nBX: " + vectors[1].X + "\nPosX: " + pos.X);
+            //Debug.Print("AZ: " + vectors[0].Z + "\nBZ: " + vectors[1].Z + "\nPosZ: " + pos.Z);            //Debug.Print("AZ: " + vectors[0].Z + "\nBZ: " + vectors[1].Z);
             //Debug.Print("YA: " + YA + ";YB: " + YB + ";YC: " + YC + ";YD: " + YD + ";YAB: " + YAB + ";YCD: " + YCD + ";pos.Y: " + pos.Y + ";X: " + pos.X + ";Z: " + pos.Z);
             target = pos + dir;
 
