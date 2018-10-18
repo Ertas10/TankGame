@@ -31,7 +31,7 @@ namespace TankGame
             device.Viewport.Height;
             effect.View = Matrix.CreateLookAt(new Vector3(1.0f/*maior numero afasta a camara*/, 20.0f/*maior numero ver top*/, 20.0f),Vector3.Zero, Vector3.Up);
             effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.ToRadians(90.0f)/*angulo da camara (aumentar o numero faz un zoom)*/, aspectRatio, 1.0f, 1000.0f)/*relação da altura*/;
+            MathHelper.ToRadians(90.0f)/*angulo da camara (aumentar o numero faz un zoom)*/, aspectRatio, 0.2f, 1000.0f)/*relação da altura*/;
             effect.LightingEnabled = false;//iluminação  ligada
             effect.VertexColorEnabled = false;//cor 
             this.worldMatrix = Matrix.Identity;//guardar na classe uma matrix identidade = diagonal com 1
@@ -126,13 +126,13 @@ namespace TankGame
 
         }
 
-        public Vector3[] GetYFromXZ(int x, int z)
+        public Vector3[] GetVerticesFromXZ(int x, int z)
         {
             Vector3[] vectors = new Vector3[4];
-            vectors[0] = vertices[x + z * terreno.Width].Position;
-            vectors[1] = vertices[x + z * terreno.Width].Position;
-            vectors[2] = vertices[x + (z + 1) * terreno.Width].Position;
-            vectors[3] = vertices[x + 1 + (z + 1) * terreno.Width].Position;
+            vectors[0] = vertices[z + x * terreno.Width].Position;
+            vectors[1] = vertices[z + 1 + x * terreno.Width].Position;
+            vectors[2] = vertices[z + (x + 1) * terreno.Width].Position;
+            vectors[3] = vertices[z + 1 + (x + 1) * terreno.Width].Position;
 
             return vectors;
         }

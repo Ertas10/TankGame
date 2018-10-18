@@ -67,22 +67,25 @@ namespace TankGame
             if (pos.Z < terreno.vertices[0].Position.Z)
                 pos.Z = terreno.vertices[0].Position.Z;
             if (pos.X > terreno.vertices[terreno.vertices.Length - 1].Position.X)
-                pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 1;
-            if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.X)
+                pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 1;
+            if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.Z)
                 pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 1;
 
-            Vector3[] vectors = terreno.GetYFromXZ((int)pos.X, (int)pos.Z);
+            Vector3[] vectors = terreno.GetVerticesFromXZ((int)pos.X, (int)pos.Z);
 
             float YA = vectors[0].Y;
             float YB = vectors[1].Y;
             float YC = vectors[2].Y;
             float YD = vectors[3].Y;
 
-            float YAB = ((((int)pos.X + 1) - pos.X) * YA + (pos.X - (int)pos.X) * YB);
-            float YCD = ((((int)pos.X + 1) - pos.X) * YC + (pos.X - (int)pos.X) * YD);
 
-            pos.Y =  ((((int)pos.Z + 1) - pos.Z) * YAB + (((int)pos.Z + 1) - pos.Z) * YCD) + 0.5f;
-            Debug.Print("YA: " + YA + ";YB: " + YB + ";YC: " + YC + ";YD: " + YD + ";YAB: " + YAB + ";YCD: " + YCD + ";pos.Y: " + pos.Y + ";X: " + pos.X + ";Z: " + pos.Z);
+            float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);
+            float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);
+
+            pos.Y =  ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) + 2f;
+            Debug.Print("AX: " + vectors[0].X + "\nBX: " + vectors[1].X + "\nPosX: " + pos.X);
+            Debug.Print("AZ: " + vectors[0].Z + "\nBZ: " + vectors[1].Z + "\nPosZ: " + pos.Z);            //Debug.Print("AZ: " + vectors[0].Z + "\nBZ: " + vectors[1].Z);
+            //Debug.Print("YA: " + YA + ";YB: " + YB + ";YC: " + YC + ";YD: " + YD + ";YAB: " + YAB + ";YCD: " + YCD + ";pos.Y: " + pos.Y + ";X: " + pos.X + ";Z: " + pos.Z);
             target = pos + dir;
 
             viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);
