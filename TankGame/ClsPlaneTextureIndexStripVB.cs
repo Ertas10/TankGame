@@ -125,7 +125,12 @@ namespace TankGame
             }
 
         }
-
+        /// <summary>
+        /// Retorna um array de 4 vértices que revolvem o ponto com x e z pedidos
+        /// </summary>
+        /// <param name="x">Coordenada x do ponto</param>
+        /// <param name="z">Coordenada z do ponto</param>
+        /// <returns></returns>
         public Vector3[] GetVerticesFromXZ(int x, int z)
         {
             Vector3[] vectors = new Vector3[4];
