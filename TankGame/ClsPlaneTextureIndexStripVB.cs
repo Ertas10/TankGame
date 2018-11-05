@@ -33,9 +33,9 @@ namespace TankGame
             effect.LightingEnabled = true;//iluminação  ligada
             //effect.EnableDefaultLighting();
             effect.DirectionalLight0.Enabled = true;
-            effect.DirectionalLight0.Direction = new Vector3(1, -0.5f, 0);
-            effect.DirectionalLight0.DiffuseColor = Color.LightYellow.ToVector3();
-            effect.DirectionalLight0.SpecularColor = new Vector3(0.6f, 0.6f, 0.6f);
+            effect.DirectionalLight0.Direction =Vector3.Normalize( new Vector3(1, -0.5f, 0));
+            effect.DirectionalLight0.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f);// Color.LightYellow.ToVector3();
+            //effect.DirectionalLight0.SpecularColor = new Vector3(0.6f, 0.6f, 0.6f);
             effect.AmbientLightColor = new Vector3(0.5f, 0.5f, 0.5f);
             effect.VertexColorEnabled = false;//cor 
             this.worldMatrix = Matrix.Identity;//guardar na classe uma matrix identidade = diagonal com 1
@@ -49,12 +49,13 @@ namespace TankGame
 
         private void CreateGeometry(GraphicsDevice device, float planeLength)
         {
+            
 
             float a = 0.0f, b=0.0f;
             vertexCount = terreno.Height * terreno.Width;//numero de vertices + a quantidade que ocupa
             vertices = new VertexPositionNormalTexture[vertexCount];
 
-            
+           
 
             Color[] heightMapColors = new Color[terreno.Width * terreno.Height];
             terreno.GetData(heightMapColors);
@@ -79,34 +80,6 @@ namespace TankGame
                     b = 0.0f;
                 }
             }
-            
-
-
-            vertexBufferFaces = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertexCount, BufferUsage.None);
-            vertexBufferFaces.SetData<VertexPositionNormalTexture>(vertices);
-
-            //indices
-            indexCount = 2 * ((terreno.Width*terreno.Height)-1);
-            short[] indices = new short[2 * (terreno.Height * terreno.Width)];//para cada lado meto dois incies vertice de baixo e o vertice de cima o +1 é para fechar o triangulo
-            int posicao = 0;
-            for (int i = 0; i < terreno.Width ; i++)
-            {
-                for (int j = 0; j < terreno.Height; j++)
-                {
-                    //primeiros indices
-                    indices[posicao++] = (short)((i * terreno.Height) + j);
-                    indices[posicao++] = (short)(((1+i) * terreno.Height) + j);
-                }
-
-
-
-            }
-            indexBufferFaces = new IndexBuffer(device, typeof(short), indexCount, BufferUsage.None);
-            indexBufferFaces.SetData<short>(indices);
-            Debug.Print("X: " + vertices[0].Position.X + "\nY: " + vertices[0].Position.Z);
-            Debug.Print("\nX: " + vertices[vertices.Length-1].Position.X + "\nY: " + vertices[vertices.Length - 1].Position.Z);
-
-
             //calculo das normais no "centro" do terreno
             for (int y = 1; y < terreno.Width - 1; y++)
             {
@@ -181,7 +154,7 @@ namespace TankGame
 
 
             //calculo das normais no limite suprior do terreno
-            for (int topo = 1; topo < terreno.Width - 2; topo++)
+            for (int topo = 1; topo < terreno.Width - 1; topo++)
             {
                 Vector3 PTopo = vertices[topo].Position;
                 Vector3 vetorTopo1 = vertices[topo + 1].Position - PTopo;
@@ -199,7 +172,7 @@ namespace TankGame
             }
 
             //calculo das normais no limite inferior do terreno
-            for (int chao = 1; chao < terreno.Width - 2; chao++)
+            for (int chao = 1; chao < terreno.Width - 1; chao++)
             {
                 Vector3 Pchao = vertices[(terreno.Width - 1) * terreno.Height + chao].Position;
                 Vector3 vetorchao1 = vertices[(terreno.Width - 1) * terreno.Height + chao - 1].Position - Pchao;
@@ -218,7 +191,7 @@ namespace TankGame
 
 
             //calculo das normais no limite direito do terreno
-            for (int lado = 1; lado < terreno.Width - 2; lado++)
+            for (int lado = 1; lado < terreno.Width - 1; lado++)
             {
                 Vector3 PD = vertices[lado * terreno.Height].Position;
                 Vector3 vetorD1 = vertices[(lado - 1) * terreno.Height].Position - PD;
@@ -237,7 +210,7 @@ namespace TankGame
             }
 
 
-            //calculo das normais no limite direito do terreno
+            //calculo das normais no limite esquerdo do terreno
             for (int lado = 2; lado < terreno.Width - 1; lado++)
             {
                 Vector3 PE = vertices[lado * terreno.Height - 1].Position;
@@ -255,6 +228,34 @@ namespace TankGame
                 Vector3 mediaD = (nE1 + nE2 + nE3 + nE4 + nE5) / 5;
                 vertices[lado * terreno.Height].Normal = mediaD;
             }
+
+
+            vertexBufferFaces = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertexCount, BufferUsage.None);
+            vertexBufferFaces.SetData<VertexPositionNormalTexture>(vertices);
+
+            //indices
+            indexCount = 2 * ((terreno.Width*terreno.Height)-1);
+            short[] indices = new short[2 * (terreno.Height * terreno.Width)];//para cada lado meto dois incies vertice de baixo e o vertice de cima o +1 é para fechar o triangulo
+            int posicao = 0;
+            for (int i = 0; i < terreno.Width ; i++)
+            {
+                for (int j = 0; j < terreno.Height; j++)
+                {
+                    //primeiros indices
+                    indices[posicao++] = (short)((i * terreno.Height) + j);
+                    indices[posicao++] = (short)(((1+i) * terreno.Height) + j);
+                }
+
+
+
+            }
+            indexBufferFaces = new IndexBuffer(device, typeof(short), indexCount, BufferUsage.None);
+            indexBufferFaces.SetData<short>(indices);
+            Debug.Print("X: " + vertices[0].Position.X + "\nY: " + vertices[0].Position.Z);
+            Debug.Print("\nX: " + vertices[vertices.Length-1].Position.X + "\nY: " + vertices[vertices.Length - 1].Position.Z);
+
+
+           
         }
     
 

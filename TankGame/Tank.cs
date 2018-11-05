@@ -29,7 +29,7 @@ namespace TankGame
                     effect.View = camera.viewMatrix;
                     effect.Projection = camera.projection;
                 }
-                mesh.Draw();
+               // mesh.Draw();
             }
 
         }
