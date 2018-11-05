@@ -53,7 +53,7 @@ namespace TankGame
             GraphicsDevice.Clear(Color.CornflowerBlue);
             Cls3DAxis.Draw(GraphicsDevice, camera.viewMatrix);
             terrain.Draw(GraphicsDevice, camera);
-            //tank.Draw(camera);
+            tank.Draw(camera);
             base.Draw(gameTime);
         }
     }
