@@ -15,6 +15,7 @@ namespace TankGame
         Vector3 pos;
         Vector3 target;
         public Matrix viewMatrix;
+        public Matrix projection;
         float yaw;
         float pitch;
         GraphicsDevice graphicsDevice;
@@ -23,8 +24,10 @@ namespace TankGame
         float cameraSpeed = 5;
 
         public Camera(GraphicsDevice graphicsDevice, ClsPlaneTextureIndexStripVB terreno){
+            float aspectRatio = (float)graphicsDevice.Viewport.Width / graphicsDevice.Viewport.Height;
+            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(90.0f), aspectRatio, 0.2f, 1000.0f);
             pos = new Vector3(1, 120, 2);
-            target = -Vector3.UnitZ;
+            target = Vector3.UnitZ;
             yaw = 0;
             pitch = 0;
             viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);
@@ -68,9 +71,9 @@ namespace TankGame
             if (pos.Z < terreno.vertices[0].Position.Z)                                         //
                 pos.Z = terreno.vertices[0].Position.Z;                                         // Mantém a camara dentro dos limites do terreno
             if (pos.X > terreno.vertices[terreno.vertices.Length - 1].Position.X)               //
-                pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 1;           //
+                pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 0.0001f;           //
             if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.Z)               //
-                pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 1;           //
+                pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 0.0001f;           //
 
             Vector3[] vectors = terreno.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              // Vai buscar os vetores que circulam a camara
 

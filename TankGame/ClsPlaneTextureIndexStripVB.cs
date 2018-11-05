@@ -27,12 +27,16 @@ namespace TankGame
             // Vamos usar um efeito básico
             effect = new BasicEffect(device);
             // Calcula a aspectRatio, a view matrix e a projeção
-            float aspectRatio = (float)device.Viewport.Width /
-            device.Viewport.Height;
+            float aspectRatio = (float)device.Viewport.Width / device.Viewport.Height;
             effect.View = Matrix.CreateLookAt(new Vector3(1.0f/*maior numero afasta a camara*/, 20.0f/*maior numero ver top*/, 20.0f),Vector3.Zero, Vector3.Up);
-            effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.ToRadians(90.0f)/*angulo da camara (aumentar o numero faz un zoom)*/, aspectRatio, 0.2f, 1000.0f)/*relação da altura*/;
-            effect.LightingEnabled = false;//iluminação  ligada
+            effect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(90.0f), aspectRatio, 0.2f, 1000.0f);
+            effect.LightingEnabled = true;//iluminação  ligada
+            //effect.EnableDefaultLighting();
+            effect.DirectionalLight0.Enabled = true;
+            effect.DirectionalLight0.Direction = new Vector3(1, -0.5f, 0);
+            effect.DirectionalLight0.DiffuseColor = Color.LightYellow.ToVector3();
+            effect.DirectionalLight0.SpecularColor = new Vector3(0.6f, 0.6f, 0.6f);
+            effect.AmbientLightColor = new Vector3(0.5f, 0.5f, 0.5f);
             effect.VertexColorEnabled = false;//cor 
             this.worldMatrix = Matrix.Identity;//guardar na classe uma matrix identidade = diagonal com 1
             effect.TextureEnabled = true;
@@ -177,7 +181,7 @@ namespace TankGame
 
 
             //calculo das normais no limite suprior do terreno
-            for (int topo = 1; topo < terreno.Width - 1; topo++)
+            for (int topo = 1; topo < terreno.Width - 2; topo++)
             {
                 Vector3 PTopo = vertices[topo].Position;
                 Vector3 vetorTopo1 = vertices[topo + 1].Position - PTopo;
@@ -195,7 +199,7 @@ namespace TankGame
             }
 
             //calculo das normais no limite inferior do terreno
-            for (int chao = 1; chao < terreno.Width - 1; chao++)
+            for (int chao = 1; chao < terreno.Width - 2; chao++)
             {
                 Vector3 Pchao = vertices[(terreno.Width - 1) * terreno.Height + chao].Position;
                 Vector3 vetorchao1 = vertices[(terreno.Width - 1) * terreno.Height + chao - 1].Position - Pchao;
@@ -214,7 +218,7 @@ namespace TankGame
 
 
             //calculo das normais no limite direito do terreno
-            for (int lado = 1; lado < terreno.Width - 1; lado++)
+            for (int lado = 1; lado < terreno.Width - 2; lado++)
             {
                 Vector3 PD = vertices[lado * terreno.Height].Position;
                 Vector3 vetorD1 = vertices[(lado - 1) * terreno.Height].Position - PD;
@@ -234,7 +238,7 @@ namespace TankGame
 
 
             //calculo das normais no limite direito do terreno
-            for (int lado = 2; lado < terreno.Width; lado++)
+            for (int lado = 2; lado < terreno.Width - 1; lado++)
             {
                 Vector3 PE = vertices[lado * terreno.Height - 1].Position;
                 Vector3 vetorE1 = vertices[(lado + 1) * terreno.Height - 1].Position - PE;
@@ -254,11 +258,12 @@ namespace TankGame
         }
     
 
-        public void Draw(GraphicsDevice device, Matrix viewMatrix)
+        public void Draw(GraphicsDevice device, Camera camera)
         {
             // World Matrix
             effect.World = worldMatrix;
-            effect.View = viewMatrix;
+            effect.View = camera.viewMatrix;
+            effect.Projection = camera.projection;
             // Indica o efeito para desenhar os eixos
             effect.CurrentTechnique.Passes[0].Apply();
             effect.Texture = this.textura;

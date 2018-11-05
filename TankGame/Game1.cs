@@ -11,6 +11,7 @@ namespace TankGame
         Camera camera;
         Cls3DAxis Cls3DAxis;
         ClsPlaneTextureIndexStripVB terrain;
+        Tank tank;
 
         public Game1()
         {
@@ -30,6 +31,8 @@ namespace TankGame
             spriteBatch = new SpriteBatch(GraphicsDevice);
             terrain = new ClsPlaneTextureIndexStripVB(GraphicsDevice, 0.2f, Content.Load<Texture2D>("terreno"), Content.Load<Texture2D>("textura"));
             camera = new Camera(GraphicsDevice, terrain);
+            tank = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(15, 15, 15));
+            
         }
 
         protected override void UnloadContent()
@@ -49,7 +52,8 @@ namespace TankGame
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             Cls3DAxis.Draw(GraphicsDevice, camera.viewMatrix);
-            terrain.Draw(GraphicsDevice, camera.viewMatrix);
+            terrain.Draw(GraphicsDevice, camera);
+            //tank.Draw(camera);
             base.Draw(gameTime);
         }
     }
