@@ -80,155 +80,184 @@ namespace TankGame
                     b = 0.0f;
                 }
             }
-            //calculo das normais no "centro" do terreno
-            for (int y = 1; y < terreno.Width - 1; y++)
-            {
-                for (int t = 1; t < terreno.Height - 1; t++)
+            
+                //calculo das normais
+                for (int x = 1; x < terreno.Width - 1; x++)
                 {
-                    Vector3 P = vertices[y * terreno.Height + t].Position;
-                    Vector3 vetor1 = vertices[(y - 1) * terreno.Height + t].Position - P;       // 
-                    Vector3 vetor2 = vertices[(y - 1) * terreno.Height + t + 1].Position - P;   //
-                    Vector3 vetor3 = vertices[y * terreno.Height + t + 1].Position - P;         //
-                    Vector3 vetor4 = vertices[(y + 1) * terreno.Height + t + 1].Position - P;   //
-                    Vector3 vetor5 = vertices[(y + 1) * terreno.Height + t].Position - P;       //
-                    Vector3 vetor6 = vertices[(y + 1) * terreno.Height + t - 1].Position - P;   //
-                    Vector3 vetor7 = vertices[y * terreno.Height + t - 1].Position - P;         //
-                    Vector3 vetor8 = vertices[(y - 1) * terreno.Height + t - 1].Position - P;   //
+                    for (int z = 1; z < terreno.Height - 1; z++)
+                    {
+                        Vector3 posCenter = vertices[x * terreno.Height + z].Position;
+                        Vector3 vectorCenter1 = vertices[(x - 1) * terreno.Height + z].Position - posCenter;
+                        Vector3 vectorCenter2 = vertices[(x - 1) * terreno.Height + z + 1].Position - posCenter;
+                        Vector3 vectorCenter3 = vertices[x * terreno.Height + z + 1].Position - posCenter;
+                        Vector3 vectorCenter4 = vertices[(x + 1) * terreno.Height + z + 1].Position - posCenter;
+                        Vector3 vectorCenter5 = vertices[(x + 1) * terreno.Height + z].Position - posCenter;
+                        Vector3 vectorCenter6 = vertices[(x + 1) * terreno.Height + z - 1].Position - posCenter;
+                        Vector3 vectorCenter7 = vertices[x * terreno.Height + z - 1].Position - posCenter;
+                        Vector3 vectorCenter8 = vertices[(x - 1) * terreno.Height + z - 1].Position - posCenter;
+                       
 
-                    Vector3 v1 = Vector3.Cross(vetor1, vetor2); v1.Normalize();
-                    Vector3 v2 = Vector3.Cross(vetor2, vetor3); v2.Normalize();
-                    Vector3 v3 = Vector3.Cross(vetor3, vetor4); v3.Normalize();
-                    Vector3 v4 = Vector3.Cross(vetor4, vetor5); v4.Normalize();
-                    Vector3 v5 = Vector3.Cross(vetor5, vetor6); v5.Normalize();
-                    Vector3 v6 = Vector3.Cross(vetor6, vetor7); v6.Normalize();
-                    Vector3 v7 = Vector3.Cross(vetor7, vetor8); v7.Normalize();
-                    Vector3 v8 = Vector3.Cross(vetor8, vetor1); v8.Normalize();
+                        Vector3 vector1 = Vector3.Cross(vectorCenter1, vectorCenter2); vector1.Normalize();
+                        Vector3 vector2 = Vector3.Cross(vectorCenter2, vectorCenter3); vector2.Normalize();
+                        Vector3 vector3 = Vector3.Cross(vectorCenter3, vectorCenter4); vector3.Normalize();
+                        Vector3 vector4 = Vector3.Cross(vectorCenter4, vectorCenter5); vector4.Normalize();
+                        Vector3 vector5 = Vector3.Cross(vectorCenter5, vectorCenter6); vector5.Normalize();
+                        Vector3 vector6 = Vector3.Cross(vectorCenter6, vectorCenter7); vector6.Normalize();
+                        Vector3 vector7 = Vector3.Cross(vectorCenter7, vectorCenter8); vector7.Normalize();
+                        Vector3 vector8 = Vector3.Cross(vectorCenter8, vectorCenter1); vector8.Normalize();
 
-                    Vector3 media = (v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8) / 8;
-                    vertices[y * terreno.Height + t].Normal = media;
+                        Vector3 media = (Vector3)(vector1 + vector2 + vector3 + vector4 + vector5 + vector6 + vector7 + vector8) / (float)8;
+                        media.Normalize();
+                        vertices[x * terreno.Height + z].Normal = media;
+
+                        //fazer draw a lineList (posTerreno, posTerreno + normal)
+                    }
                 }
-            }
-            //calculo das normais no canto suprior esquerdo do terreno
-            Vector3 PSE = vertices[0].Position;
-            Vector3 vetorSE1 = vertices[1].Position - PSE;
-            Vector3 vetorSE2 = vertices[terreno.Height + 1].Position - PSE;
-            Vector3 vetorSE3 = vertices[terreno.Height].Position - PSE;
-            Vector3 vSE1 = Vector3.Cross(vetorSE1, vetorSE2); vSE1.Normalize();
-            Vector3 vSE2 = Vector3.Cross(vetorSE2, vetorSE3); vSE2.Normalize();
-            Vector3 vSE3 = Vector3.Cross(vetorSE3, vetorSE1); vSE3.Normalize();
-            Vector3 mediaSE = (vSE1 + vSE2 + vSE3) / 3;
-            vertices[0].Normal = mediaSE;
 
-            //calculo das normais no canto suprior direito do terreno
-            Vector3 PSD = vertices[terreno.Width - 1].Position;
-            Vector3 vetorSD1 = vertices[2 * (terreno.Height - 1)].Position - PSD;
-            Vector3 vetorSD2 = vertices[2 * (terreno.Height - 1) - 1].Position - PSD;
-            Vector3 vetorSD3 = vertices[terreno.Height - 2].Position - PSD;
-            Vector3 vSD1 = Vector3.Cross(vetorSD1, vetorSD2); vSD1.Normalize();
-            Vector3 vSD2 = Vector3.Cross(vetorSD2, vetorSD3); vSD2.Normalize();
-            Vector3 vSD3 = Vector3.Cross(vetorSD3, vetorSD1); vSD3.Normalize();
-            Vector3 mediaSD = (vSD1 + vSD2 + vSD3) / 3;
-            vertices[terreno.Width - 1].Normal = mediaSD;
+                //calculo superior esquerdo das normais
 
-            //calculo das normais no canto Iinferior esquerdo do terreno
-            Vector3 PIE = vertices[(terreno.Width - 1) * terreno.Height].Position;
-            Vector3 vetorIE1 = vertices[(terreno.Width - 2) * terreno.Height].Position - PIE;
-            Vector3 vetorIE2 = vertices[(terreno.Width - 2) * terreno.Height + 1].Position - PIE;
-            Vector3 vetorIE3 = vertices[(terreno.Width - 1) * terreno.Height + 1].Position - PIE;
-            Vector3 vIE1 = Vector3.Cross(vetorIE1, vetorIE2); vIE1.Normalize();
-            Vector3 vIE2 = Vector3.Cross(vetorIE2, vetorIE3); vIE2.Normalize();
-            Vector3 vIE3 = Vector3.Cross(vetorIE3, vetorIE1); vIE3.Normalize();
-            Vector3 mediaIE = (vIE1 + vIE2 + vIE3) / 3;
-            vertices[(terreno.Width - 1) * terreno.Height].Normal = mediaIE;
-
-            //calculo das normais no canto Iinferior esquerdo do terreno
-            Vector3 PID = vertices[terreno.Width * terreno.Height - 1].Position;
-            Vector3 vetorID1 = vertices[terreno.Width * terreno.Height - 2].Position - PID;
-            Vector3 vetorID2 = vertices[(terreno.Width - 1) * terreno.Height - 2].Position - PID;
-            Vector3 vetorID3 = vertices[(terreno.Width - 1) * terreno.Height - 1].Position - PID;
-            Vector3 vID1 = Vector3.Cross(vetorID1, vetorID2); vID1.Normalize();
-            Vector3 vID2 = Vector3.Cross(vetorID2, vetorID3); vID2.Normalize();
-            Vector3 vID3 = Vector3.Cross(vetorID3, vetorID1); vID3.Normalize();
-            Vector3 mediaID = (vID1 + vID2 + vID3) / 3;
-            vertices[terreno.Width * terreno.Height - 1].Normal = mediaID;
+                Vector3 posSE = vertices[0].Position;
+                Vector3 vetorSupE1 = vertices[1].Position - posSE;
+                Vector3 vetorSupE2 = vertices[terreno.Height + 1].Position - posSE;
+                Vector3 vetorSupE3 = vertices[terreno.Height].Position - posSE;
+                Vector3 vSE1 = Vector3.Cross(vetorSupE1, vetorSupE2);
+                Vector3 vSE2 = Vector3.Cross(vetorSupE2, vetorSupE3);
+                Vector3 vSE3 = Vector3.Cross(vetorSupE3, vetorSupE1);
+                Vector3 mediaSE = (Vector3)(vSE1 + vSE2 + vSE3) / (float)3;
+                mediaSE.Normalize();
+                vertices[0].Normal = mediaSE;
 
 
-            //calculo das normais no limite suprior do terreno
-            for (int topo = 1; topo < terreno.Width - 1; topo++)
-            {
-                Vector3 PTopo = vertices[topo].Position;
-                Vector3 vetorTopo1 = vertices[topo + 1].Position - PTopo;
-                Vector3 vetorTopo2 = vertices[topo + 1 + terreno.Width].Position - PTopo;
-                Vector3 vetorTopo3 = vertices[topo + terreno.Width].Position - PTopo;
-                Vector3 vetorTopo4 = vertices[topo - 1 + terreno.Width].Position - PTopo;
-                Vector3 vetorTopo5 = vertices[topo - 1].Position - PTopo;
-                Vector3 nTopo1 = -Vector3.Cross(vetorTopo1, vetorTopo2); nTopo1.Normalize();
-                Vector3 nTopo2 = -Vector3.Cross(vetorTopo2, vetorTopo3); nTopo2.Normalize();
-                Vector3 nTopo3 = -Vector3.Cross(vetorTopo3, vetorTopo4); nTopo3.Normalize();
-                Vector3 nTopo4 = -Vector3.Cross(vetorTopo4, vetorTopo5); nTopo4.Normalize();
-                Vector3 nTopo5 = -Vector3.Cross(vetorTopo5, vetorTopo1); nTopo5.Normalize();
-                Vector3 mediaTopo = (nTopo1 + nTopo2 + nTopo3 + nTopo4 + nTopo5) / 5;
-                vertices[topo].Normal = mediaTopo;
-            }
 
-            //calculo das normais no limite inferior do terreno
-            for (int chao = 1; chao < terreno.Width - 1; chao++)
-            {
-                Vector3 Pchao = vertices[(terreno.Width - 1) * terreno.Height + chao].Position;
-                Vector3 vetorchao1 = vertices[(terreno.Width - 1) * terreno.Height + chao - 1].Position - Pchao;
-                Vector3 vetorchao2 = vertices[(terreno.Width - 2) * terreno.Height + chao - 1].Position - Pchao;
-                Vector3 vetorchao3 = vertices[(terreno.Width - 2) * terreno.Height + chao].Position - Pchao;
-                Vector3 vetorchao4 = vertices[(terreno.Width - 2) * terreno.Height + chao + 1].Position - Pchao;
-                Vector3 vetorchao5 = vertices[(terreno.Width - 1) * terreno.Height + chao + 1].Position - Pchao;
-                Vector3 nChao1 = -Vector3.Cross(vetorchao1, vetorchao2); nChao1.Normalize();
-                Vector3 nChao2 = -Vector3.Cross(vetorchao2, vetorchao3); nChao2.Normalize();
-                Vector3 nChao3 = -Vector3.Cross(vetorchao3, vetorchao4); nChao3.Normalize();
-                Vector3 nChao4 = -Vector3.Cross(vetorchao4, vetorchao5); nChao4.Normalize();
-                Vector3 nChao5 = -Vector3.Cross(vetorchao5, vetorchao1); nChao5.Normalize();
-                Vector3 mediaChao = (nChao1 + nChao2 + nChao3 + nChao4 + nChao5) / 5;
-                vertices[(terreno.Width - 1) * terreno.Height + chao].Normal = mediaChao;
-            }
+                //calculo superior direito das normais
+                Vector3 posSD = vertices[terreno.Width - 1].Position;
+                Vector3 vetorSupD1 = vertices[2 * terreno.Height - 1].Position - posSD;
+                Vector3 vetorSupD2 = vertices[2 * terreno.Height - 2].Position - posSD;
+                Vector3 vetorSupD3 = vertices[terreno.Height - 2].Position - posSD;
+                Vector3 vSD1 = Vector3.Cross(vetorSupD1, vetorSupD2);
+                Vector3 vSD2 = Vector3.Cross(vetorSupD2, vetorSupD3);
+                Vector3 vSD3 = Vector3.Cross(vetorSupD3, vetorSupD1);
+                Vector3 mediaSupD = (Vector3)(vSD1 + vSD2 + vSD3) / (float)3;
+                mediaSupD.Normalize();
+                vertices[terreno.Height - 1].Normal = mediaSupD;
 
 
-            //calculo das normais no limite direito do terreno
-            for (int lado = 1; lado < terreno.Width - 1; lado++)
-            {
-                Vector3 PD = vertices[lado * terreno.Height].Position;
-                Vector3 vetorD1 = vertices[(lado - 1) * terreno.Height].Position - PD;
-                Vector3 vetorD2 = vertices[(lado - 1) * terreno.Height + 1].Position - PD;
-                Vector3 vetorD3 = vertices[lado * terreno.Height + 1].Position - PD;
-                Vector3 vetorD4 = vertices[(lado + 1) * terreno.Height + 1].Position - PD;
-                Vector3 vetorD5 = vertices[(lado + 1) * terreno.Height].Position - PD;
+                //calculo inferior direito das normais
+                Vector3 PInfD = vertices[terreno.Width * terreno.Height - 1].Position;
+                Vector3 vetorInfD1 = vertices[terreno.Width * terreno.Height - 2].Position - PInfD;
+                Vector3 vetorInfD2 = vertices[(terreno.Width - 1) * terreno.Height - 2].Position - PInfD;
+                Vector3 vetorInfD3 = vertices[(terreno.Width - 1) * terreno.Height - 1].Position - PInfD;
+                Vector3 vID1 = Vector3.Cross(vetorInfD1, vetorInfD2);
+                Vector3 vID2 = Vector3.Cross(vetorInfD2, vetorInfD3);
+                Vector3 vID3 = Vector3.Cross(vetorInfD3, vetorInfD1);
+                Vector3 mediaInfD = (Vector3)(vID1 + vID2 + vID3) / (float)3;
+                mediaInfD.Normalize();
+                vertices[terreno.Width * terreno.Height - 1].Normal = mediaInfD;
 
-                Vector3 nD1 = -Vector3.Cross(vetorD1, vetorD2); nD1.Normalize();
-                Vector3 nD2 = -Vector3.Cross(vetorD2, vetorD3); nD2.Normalize();
-                Vector3 nD3 = -Vector3.Cross(vetorD3, vetorD4); nD3.Normalize();
-                Vector3 nD4 = -Vector3.Cross(vetorD4, vetorD5); nD4.Normalize();
-                Vector3 nD5 = -Vector3.Cross(vetorD5, vetorD1); nD5.Normalize();
-                Vector3 mediaD = (nD1 + nD2 + nD3 + nD4 + nD5) / 5;
-                vertices[lado * terreno.Height].Normal = mediaD;
-            }
+                //calculo inferior esquerdo das normais
+
+                Vector3 posInfE = vertices[(terreno.Width - 1) * terreno.Height].Position;
+                Vector3 vetorInfE1 = vertices[(terreno.Width - 2) * terreno.Height].Position - posInfE;
+                Vector3 vetorInfE2 = vertices[(terreno.Width - 2) * terreno.Height + 1].Position - posInfE;
+                Vector3 vetorInfE3 = vertices[(terreno.Width - 1) * terreno.Height + 1].Position - posInfE;
+                Vector3 vIE1 = Vector3.Cross(vetorInfE1, vetorInfE2);
+                Vector3 vIE2 = Vector3.Cross(vetorInfE2, vetorInfE3);
+                Vector3 vIE3 = Vector3.Cross(vetorInfE3, vetorInfE1);
+                Vector3 mediaInfE = (Vector3)(vIE1 + vIE2 + vIE3) / (float)3;
+                mediaInfE.Normalize();
+                vertices[(terreno.Width - 1) * terreno.Height].Normal = mediaInfE;
 
 
-            //calculo das normais no limite esquerdo do terreno
-            for (int lado = 2; lado < terreno.Width - 1; lado++)
-            {
-                Vector3 PE = vertices[lado * terreno.Height - 1].Position;
-                Vector3 vetorE1 = vertices[(lado + 1) * terreno.Height - 1].Position - PE;
-                Vector3 vetorE2 = vertices[(lado + 1) * terreno.Height - 2].Position - PE;
-                Vector3 vetorE3 = vertices[lado * terreno.Height - 1].Position - PE;
-                Vector3 vetorE4 = vertices[(lado - 1) * terreno.Height - 2].Position - PE;
-                Vector3 vetorE5 = vertices[(lado - 1) * terreno.Height - 1].Position - PE;
 
-                Vector3 nE1 = -Vector3.Cross(vetorE1, vetorE2); nE1.Normalize();
-                Vector3 nE2 = -Vector3.Cross(vetorE2, vetorE3); nE2.Normalize();
-                Vector3 nE3 = -Vector3.Cross(vetorE3, vetorE4); nE3.Normalize();
-                Vector3 nE4 = -Vector3.Cross(vetorE4, vetorE5); nE4.Normalize();
-                Vector3 nE5 = -Vector3.Cross(vetorE5, vetorE1); nE5.Normalize();
-                Vector3 mediaD = (nE1 + nE2 + nE3 + nE4 + nE5) / 5;
-                vertices[lado * terreno.Height].Normal = mediaD;
-            }
 
+
+                //calculo das normais da esquerda
+                for (int topRow = 1; topRow < terreno.Width - 1; topRow++)
+                {
+                    Vector3 PTopo = vertices[topRow].Position;
+                    Vector3 vetorTopo1 = PTopo - vertices[topRow + 1].Position;
+                    Vector3 vetorTopo2 = PTopo - vertices[topRow + 1 + terreno.Width].Position;
+                    Vector3 vetorTopo3 = PTopo - vertices[topRow + terreno.Width].Position;
+                    Vector3 vetorTopo4 = PTopo - vertices[topRow - 1 + terreno.Width].Position;
+                    Vector3 vetorTopo5 = PTopo - vertices[topRow - 1].Position;
+
+                    Vector3 nTopo1 = -Vector3.Cross(vetorTopo2, vetorTopo1);
+                    Vector3 nTopo2 = -Vector3.Cross(vetorTopo3, vetorTopo2);
+                    Vector3 nTopo3 = -Vector3.Cross(vetorTopo4, vetorTopo3);
+                    Vector3 nTopo4 = -Vector3.Cross(vetorTopo5, vetorTopo4);
+                    Vector3 nTopo5 = -Vector3.Cross(vetorTopo1, vetorTopo5);
+                    Vector3 mediaTopo = (Vector3)(nTopo1 + nTopo2 + nTopo3 + nTopo4 + nTopo5) / (float)5;
+                    mediaTopo.Normalize();
+                    vertices[topRow].Normal = mediaTopo;
+
+
+
+                }
+
+
+
+                //calculo das normais no limite inferior do terreno
+                for (int bottonRow = 1; bottonRow < terreno.Width - 2; bottonRow++)
+                {
+                    Vector3 Pchao = vertices[(terreno.Width - 1) * terreno.Height + bottonRow].Position;
+                    Vector3 vetorchao1 = Pchao - vertices[(terreno.Width - 1) * terreno.Height + bottonRow - 1].Position;
+                    Vector3 vetorchao2 = Pchao - vertices[(terreno.Width - 2) * terreno.Height + bottonRow - 1].Position;
+                    Vector3 vetorchao3 = Pchao - vertices[(terreno.Width - 2) * terreno.Height + bottonRow].Position;
+                    Vector3 vetorchao4 = Pchao - vertices[(terreno.Width - 2) * terreno.Height + bottonRow + 1].Position;
+                    Vector3 vetorchao5 = Pchao - vertices[(terreno.Width - 1) * terreno.Height + bottonRow + 1].Position;
+                    Vector3 nChao1 = Vector3.Cross(vetorchao1, vetorchao2);
+                    Vector3 nChao2 = Vector3.Cross(vetorchao2, vetorchao3);
+                    Vector3 nChao3 = Vector3.Cross(vetorchao3, vetorchao4);
+                    Vector3 nChao4 = Vector3.Cross(vetorchao4, vetorchao5);
+                    Vector3 nChao5 = Vector3.Cross(vetorchao5, vetorchao1);
+                    Vector3 mediaChao = (Vector3)(nChao1 + nChao2 + nChao3 + nChao4 + nChao5) / (float)5;
+                    mediaChao.Normalize();
+                    vertices[(terreno.Width - 1) * terreno.Height + bottonRow].Normal = mediaChao;
+                }
+
+
+                //calculo das normais no limite direito do terreno
+                for (int ladoDir = 1; ladoDir < terreno.Width - 2; ladoDir++)
+                {
+                    Vector3 PD = vertices[ladoDir * terreno.Height].Position;
+                    Vector3 vetorD1 = vertices[(ladoDir - 1) * terreno.Height].Position - PD;
+                    Vector3 vetorD2 = vertices[(ladoDir - 1) * terreno.Height + 1].Position - PD;
+                    Vector3 vetorD3 = vertices[ladoDir * terreno.Height + 1].Position - PD;
+                    Vector3 vetorD4 = vertices[(ladoDir + 1) * terreno.Height + 1].Position - PD;
+                    Vector3 vetorD5 = vertices[(ladoDir + 1) * terreno.Height].Position - PD;
+
+                    Vector3 nD1 = -Vector3.Cross(vetorD1, vetorD2);
+                    Vector3 nD2 = -Vector3.Cross(vetorD2, vetorD3);
+                    Vector3 nD3 = -Vector3.Cross(vetorD3, vetorD4);
+                    Vector3 nD4 = -Vector3.Cross(vetorD4, vetorD5);
+                    Vector3 nD5 = -Vector3.Cross(vetorD5, vetorD1);
+                    Vector3 mediaD = (Vector3)(nD1 + nD2 + nD3 + nD4 + nD5) / (float)5;
+                    mediaD.Normalize();
+                    vertices[ladoDir * terreno.Height].Normal = mediaD;
+                }
+
+
+                //calculo das normais no limite esquerdo do terreno (actually é o direito)
+                for (int ladoEsq = 2; ladoEsq < terreno.Width - 1; ladoEsq++)
+                {
+                    Vector3 PE = vertices[ladoEsq * terreno.Height - 1].Position;
+                    Vector3 vetorE1 = vertices[(ladoEsq + 1) * terreno.Height - 1].Position - PE;
+                    Vector3 vetorE2 = vertices[(ladoEsq + 1) * terreno.Height - 2].Position - PE;
+                    Vector3 vetorE3 = vertices[ladoEsq * terreno.Height - 1].Position - PE;
+                    Vector3 vetorE4 = vertices[(ladoEsq - 1) * terreno.Height - 2].Position - PE;
+                    Vector3 vetorE5 = vertices[(ladoEsq - 1) * terreno.Height - 1].Position - PE;
+
+                    Vector3 nE1 = -Vector3.Cross(vetorE1, vetorE2);
+                    Vector3 nE2 = -Vector3.Cross(vetorE2, vetorE3);
+                    Vector3 nE3 = -Vector3.Cross(vetorE3, vetorE4);
+                    Vector3 nE4 = -Vector3.Cross(vetorE4, vetorE5);
+                    Vector3 nE5 = -Vector3.Cross(vetorE5, vetorE1);
+                    Vector3 mediaD = (Vector3)(nE1 + nE2 + nE3 + nE4 + nE5) / (float)5;
+                    mediaD.Normalize();
+                    vertices[ladoEsq * terreno.Height].Normal = mediaD;
+                }
+
+            
 
             vertexBufferFaces = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertexCount, BufferUsage.None);
             vertexBufferFaces.SetData<VertexPositionNormalTexture>(vertices);

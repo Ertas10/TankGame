@@ -24,7 +24,7 @@ namespace TankGame
         float cameraSpeed = 5;
 
         public Camera(GraphicsDevice graphicsDevice, ClsPlaneTextureIndexStripVB terreno){
-            float aspectRatio = (float)graphicsDevice.Viewport.Width / graphicsDevice.Viewport.Height;
+            float aspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
             projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(90.0f), aspectRatio, 0.2f, 1000.0f);
             pos = new Vector3(1, 120, 2);
             target = Vector3.UnitZ;
