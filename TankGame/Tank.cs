@@ -12,16 +12,17 @@ namespace TankGame
 {
      class Tank
     {
-        float Speed = 5;
+        float Speed = 1f;
         Vector3 pos;
         Model model;
         ClsPlaneTextureIndexStripVB terrain;
         BasicEffect effect;
         float aspectRatio;
+        float yaw = 0;
         //Bones
         ModelBone turretBone, cannonBone;
         //matrixes
-        Matrix worldMatrix;
+        float scale = 0.01f;
         //Default Transforms
         Matrix cannonTransform;
         Matrix turretTransform;
@@ -31,7 +32,6 @@ namespace TankGame
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice) {
             this.model = model;
             this.terrain = terrain;
-            worldMatrix = Matrix.CreateWorld(new Vector3(15, 15, 15), Vector3.Forward, Vector3.Up);
 
             pos = startingPos;
             effect = new BasicEffect(graphicsDevice);
@@ -46,7 +46,7 @@ namespace TankGame
 
             boneTransforms = new Matrix[model.Bones.Count];
 
-            model.Root.Transform = Matrix.CreateScale(0.005f) * Matrix.CreateRotationY(1.5f) * Matrix.CreateRotationX(0.2f) * Matrix.CreateTranslation(new Vector3(30f, 6f, 30f));
+            model.Root.Transform = Matrix.CreateScale(scale) * Matrix.CreateRotationY(yaw) * Matrix.CreateTranslation(new Vector3(30f, 6f, 30f));
 
             model.CopyAbsoluteBoneTransformsTo(boneTransforms);
             
@@ -55,29 +55,53 @@ namespace TankGame
 
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
+            if (keyboard.IsKeyDown(Keys.A))
+                yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (keyboard.IsKeyDown(Keys.D))
+                yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
 
+            Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
 
-            Vector3 dir = Vector3.Transform(-Vector3.UnitZ, worldMatrix);
+            Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);
             
             Vector3 right = Vector3.Cross(dir, Vector3.Up);
 
             if (keyboard.IsKeyDown(Keys.W))
-            {                                               
-                pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;   
+            {
+                pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }                                                                                   
             if (keyboard.IsKeyDown(Keys.S))
             {                                               
-                pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;   
+                pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;   
             }                                                                                   
-            if (keyboard.IsKeyDown(Keys.A))
-            {                                               
-                 
-            }                                                                                   
-            if (keyboard.IsKeyDown(Keys.D))
-            {                                               
-                 
-            }
 
+            if (pos.X < terrain.vertices[0].Position.X)                                         //
+                pos.X = terrain.vertices[0].Position.X;                                         //
+            if (pos.Z < terrain.vertices[0].Position.Z)                                         //
+                pos.Z = terrain.vertices[0].Position.Z;                                         //
+            if (pos.X > terrain.vertices[terrain.vertices.Length - 1].Position.X)               //
+                pos.X = terrain.vertices[terrain.vertices.Length - 1].Position.X - 0.0001f;     //
+            if (pos.Z > terrain.vertices[terrain.vertices.Length - 1].Position.Z)               //
+                pos.Z = terrain.vertices[terrain.vertices.Length - 1].Position.Z - 0.0001f;     //
+
+            Vector3[] vectors = terrain.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              //
+
+            float YA = vectors[0].Y;                                                            //
+            float YB = vectors[1].Y;                                                            //
+            float YC = vectors[2].Y;                                                            //
+            float YD = vectors[3].Y;                                                            //
+
+
+            float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          //
+            float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          //
+
+            pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD);      //
+            Matrix translation = Matrix.CreateTranslation(pos);
+
+            model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;
+            Debug.Print(pos.ToString());
+            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
         }
         public void Draw(Camera camera)
         {
@@ -88,7 +112,7 @@ namespace TankGame
                     effect.World = boneTransforms[mesh.ParentBone.Index];
                     effect.View = camera.viewMatrix;
                     //effect.Projection = camera.projection;
-                    effect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(90), aspectRatio, 1, 1000);
+                    effect.Projection = camera.projection;
                     effect.EnableDefaultLighting();
                 }
                 mesh.Draw();

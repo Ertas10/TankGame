@@ -44,7 +44,7 @@ namespace TankGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             camera.Update(Keyboard.GetState(), Mouse.GetState(), gameTime);
-
+            tank.Update(Keyboard.GetState(), gameTime);
             base.Update(gameTime);
         }
 

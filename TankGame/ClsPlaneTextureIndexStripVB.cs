@@ -124,7 +124,7 @@ namespace TankGame
                 Vector3 vSE2 = Vector3.Cross(vetorSupE2, vetorSupE3);
                 Vector3 vSE3 = Vector3.Cross(vetorSupE3, vetorSupE1);
                 Vector3 mediaSE = (Vector3)(vSE1 + vSE2 + vSE3) / (float)3;
-                mediaSE.Normalize();
+                mediaSE.Normalize(); 
                 vertices[0].Normal = mediaSE;
 
 
