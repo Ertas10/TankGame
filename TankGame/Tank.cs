@@ -121,6 +121,11 @@ namespace TankGame
                     //effect.Projection = camera.projection;
                     effect.Projection = camera.projection;
                     effect.EnableDefaultLighting();
+                    effect.DirectionalLight0.Enabled = true;
+                    effect.DirectionalLight0.DiffuseColor = camera.effect.DirectionalLight0.DiffuseColor;
+                    effect.DirectionalLight0.SpecularColor = camera.effect.DirectionalLight0.SpecularColor;
+                    effect.DirectionalLight0.Direction = camera.effect.DirectionalLight0.Direction;
+                    effect.AmbientLightColor = camera.effect.AmbientLightColor;
                 }
                 mesh.Draw();
             }

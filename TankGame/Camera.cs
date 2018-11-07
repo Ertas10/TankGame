@@ -22,6 +22,7 @@ namespace TankGame
         float escalaRadianosPorPixel;
         ClsPlaneTextureIndexStripVB terreno;
         float cameraSpeed = 5;
+        public BasicEffect effect;
 
         public Camera(GraphicsDevice graphicsDevice, ClsPlaneTextureIndexStripVB terreno){
             float aspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
@@ -35,6 +36,13 @@ namespace TankGame
             escalaRadianosPorPixel = (float)Math.PI / 1000f;
             Mouse.SetPosition(this.graphicsDevice.Viewport.Width / 2, this.graphicsDevice.Viewport.Height / 2);
             this.terreno = terreno;
+            effect = new BasicEffect(graphicsDevice);
+            effect.EnableDefaultLighting();
+            effect.DirectionalLight0.Enabled = true;
+            effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(1, -0.5f, 0));
+            effect.DirectionalLight0.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f);
+            effect.AmbientLightColor = new Vector3(0.5f, 0.5f, 0.5f);
+            effect.VertexColorEnabled = false;
         }
 
         public void Update(KeyboardState keyboard, MouseState mouse, GameTime gameTime){
