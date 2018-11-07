@@ -122,8 +122,7 @@ namespace TankGame
                 Vector3 vetorSupE3 = vertices[terreno.Height].Position - posSE;
                 Vector3 vSE1 = Vector3.Cross(vetorSupE1, vetorSupE2);
                 Vector3 vSE2 = Vector3.Cross(vetorSupE2, vetorSupE3);
-                Vector3 vSE3 = Vector3.Cross(vetorSupE3, vetorSupE1);
-                Vector3 mediaSE = (Vector3)(vSE1 + vSE2 + vSE3) / (float)3;
+                Vector3 mediaSE = (Vector3)(vSE1 + vSE2) / (float)2;
                 mediaSE.Normalize(); 
                 vertices[0].Normal = mediaSE;
 
@@ -136,8 +135,7 @@ namespace TankGame
                 Vector3 vetorSupD3 = vertices[terreno.Height - 2].Position - posSD;
                 Vector3 vSD1 = Vector3.Cross(vetorSupD1, vetorSupD2);
                 Vector3 vSD2 = Vector3.Cross(vetorSupD2, vetorSupD3);
-                Vector3 vSD3 = Vector3.Cross(vetorSupD3, vetorSupD1);
-                Vector3 mediaSupD = (Vector3)(vSD1 + vSD2 + vSD3) / (float)3;
+                Vector3 mediaSupD = (Vector3)(vSD1 + vSD2) / (float)2;
                 mediaSupD.Normalize();
                 vertices[terreno.Height - 1].Normal = mediaSupD;
 
@@ -149,8 +147,7 @@ namespace TankGame
                 Vector3 vetorInfD3 = vertices[(terreno.Width - 1) * terreno.Height - 1].Position - PInfD;
                 Vector3 vID1 = Vector3.Cross(vetorInfD1, vetorInfD2);
                 Vector3 vID2 = Vector3.Cross(vetorInfD2, vetorInfD3);
-                Vector3 vID3 = Vector3.Cross(vetorInfD3, vetorInfD1);
-                Vector3 mediaInfD = (Vector3)(vID1 + vID2 + vID3) / (float)3;
+                Vector3 mediaInfD = (Vector3)(vID1 + vID2) / (float)2;
                 mediaInfD.Normalize();
                 vertices[terreno.Width * terreno.Height - 1].Normal = mediaInfD;
 
@@ -162,8 +159,7 @@ namespace TankGame
                 Vector3 vetorInfE3 = vertices[(terreno.Width - 1) * terreno.Height + 1].Position - posInfE;
                 Vector3 vIE1 = Vector3.Cross(vetorInfE1, vetorInfE2);
                 Vector3 vIE2 = Vector3.Cross(vetorInfE2, vetorInfE3);
-                Vector3 vIE3 = Vector3.Cross(vetorInfE3, vetorInfE1);
-                Vector3 mediaInfE = (Vector3)(vIE1 + vIE2 + vIE3) / (float)3;
+                Vector3 mediaInfE = (Vector3)(vIE1 + vIE2) / (float)2;
                 mediaInfE.Normalize();
                 vertices[(terreno.Width - 1) * terreno.Height].Normal = mediaInfE;
 
@@ -185,8 +181,7 @@ namespace TankGame
                     Vector3 nTopo2 = -Vector3.Cross(vetorTopo3, vetorTopo2);
                     Vector3 nTopo3 = -Vector3.Cross(vetorTopo4, vetorTopo3);
                     Vector3 nTopo4 = -Vector3.Cross(vetorTopo5, vetorTopo4);
-                    Vector3 nTopo5 = -Vector3.Cross(vetorTopo1, vetorTopo5);
-                    Vector3 mediaTopo = (Vector3)(nTopo1 + nTopo2 + nTopo3 + nTopo4 + nTopo5) / (float)5;
+                    Vector3 mediaTopo = (Vector3)(nTopo1 + nTopo2 + nTopo3 + nTopo4) / (float)4;
                     mediaTopo.Normalize();
                     vertices[topRow].Normal = mediaTopo;
 
@@ -209,8 +204,7 @@ namespace TankGame
                     Vector3 nChao2 = Vector3.Cross(vetorchao2, vetorchao3);
                     Vector3 nChao3 = Vector3.Cross(vetorchao3, vetorchao4);
                     Vector3 nChao4 = Vector3.Cross(vetorchao4, vetorchao5);
-                    Vector3 nChao5 = Vector3.Cross(vetorchao5, vetorchao1);
-                    Vector3 mediaChao = (Vector3)(nChao1 + nChao2 + nChao3 + nChao4 + nChao5) / (float)5;
+                    Vector3 mediaChao = (Vector3)(nChao1 + nChao2 + nChao3 + nChao4) / (float)4;
                     mediaChao.Normalize();
                     vertices[(terreno.Width - 1) * terreno.Height + bottonRow].Normal = mediaChao;
                 }
@@ -230,8 +224,7 @@ namespace TankGame
                     Vector3 nD2 = -Vector3.Cross(vetorD2, vetorD3);
                     Vector3 nD3 = -Vector3.Cross(vetorD3, vetorD4);
                     Vector3 nD4 = -Vector3.Cross(vetorD4, vetorD5);
-                    Vector3 nD5 = -Vector3.Cross(vetorD5, vetorD1);
-                    Vector3 mediaD = (Vector3)(nD1 + nD2 + nD3 + nD4 + nD5) / (float)5;
+                    Vector3 mediaD = (Vector3)(nD1 + nD2 + nD3 + nD4) / (float)4;
                     mediaD.Normalize();
                     vertices[ladoDir * terreno.Height].Normal = mediaD;
                 }
@@ -251,8 +244,7 @@ namespace TankGame
                     Vector3 nE2 = -Vector3.Cross(vetorE2, vetorE3);
                     Vector3 nE3 = -Vector3.Cross(vetorE3, vetorE4);
                     Vector3 nE4 = -Vector3.Cross(vetorE4, vetorE5);
-                    Vector3 nE5 = -Vector3.Cross(vetorE5, vetorE1);
-                    Vector3 mediaD = (Vector3)(nE1 + nE2 + nE3 + nE4 + nE5) / (float)5;
+                    Vector3 mediaD = (Vector3)(nE1 + nE2 + nE3 + nE4) / (float)4;
                     mediaD.Normalize();
                     vertices[ladoEsq * terreno.Height].Normal = mediaD;
                 }
