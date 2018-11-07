@@ -319,5 +319,15 @@ namespace TankGame
 
             return vectors;
         }
+
+        public Vector3[] GetNormalsFromXZ(int x, int z){
+            Vector3[] vectors = new Vector3[4];
+            vectors[0] = vertices[z + x * terreno.Width].Normal;
+            vectors[1] = vertices[z + 1 + x * terreno.Width].Normal;
+            vectors[2] = vertices[z + (x + 1) * terreno.Width].Normal;
+            vectors[3] = vertices[z + 1 + (x + 1) * terreno.Width].Normal;
+
+            return vectors;
+        }
     }
 }
