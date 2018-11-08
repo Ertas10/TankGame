@@ -73,7 +73,7 @@ namespace TankGame
                     {
                         b = 1.0f;
                     }
-                    heightData[X, Z] = heightMapColors[X + Z * terreno.Width].R / 10.0f;
+                    heightData[X, Z] = heightMapColors[X + Z * terreno.Width].R / 20.0f;
                     vertices[X * terreno.Width + Z] = new VertexPositionNormalTexture(new Vector3(X, heightData[X, Z], Z), Vector3.UnitY ,new Vector2(a, b));
 
                     a = 0.0f;

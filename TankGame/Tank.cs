@@ -12,7 +12,8 @@ namespace TankGame
 {
      class Tank
     {
-        float Speed = 3f;
+        float speed = 3.5f;
+        float rotSpeed = 2f;
         Vector3 pos;
         Model model;
         ClsPlaneTextureIndexStripVB terrain;
@@ -21,7 +22,7 @@ namespace TankGame
         //Bones
         ModelBone turretBone, cannonBone;
         //matrixes
-        float scale = 0.01f;
+        float scale = 0.008f;
         //Default Transforms
         Matrix cannonTransform;
         Matrix turretTransform;
@@ -54,9 +55,9 @@ namespace TankGame
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
             if (keyboard.IsKeyDown(Keys.A))
-                yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                yaw += rotSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyboard.IsKeyDown(Keys.D))
-                yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                yaw -= rotSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             
             Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
 
@@ -65,9 +66,9 @@ namespace TankGame
             Vector3 right = Vector3.Cross(dir, Vector3.Up);
 
             if (keyboard.IsKeyDown(Keys.W))
-                pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                pos = pos - dir * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (keyboard.IsKeyDown(Keys.S))
-                pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                pos = pos + dir * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (pos.X < terrain.vertices[0].Position.X)                                         //
                 pos.X = terrain.vertices[0].Position.X;                                         //
@@ -95,10 +96,11 @@ namespace TankGame
             normal.Normalize();
 
             Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));
-
+            dirH.Normalize();
             right = Vector3.Cross(dirH, normal);
-
+            right.Normalize();
             dir = Vector3.Cross(normal, right);
+            dir.Normalize();
 
             rotation = Matrix.Identity;
             rotation.Forward = dir;
