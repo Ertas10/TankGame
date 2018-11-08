@@ -21,7 +21,7 @@ namespace TankGame
         //Bones
         ModelBone turretBone, cannonBone;
         //matrixes
-        float scale = 0.01f;
+        float scale = 0.005f;
         //Default Transforms
         Matrix cannonTransform;
         Matrix turretTransform;
@@ -95,11 +95,12 @@ namespace TankGame
             normal.Normalize();
 
             Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));
+            dirH.Normalize();
 
             right = Vector3.Cross(dirH, normal);
-
+            right.Normalize();
             dir = Vector3.Cross(normal, right);
-
+            dir.Normalize();
             rotation = Matrix.Identity;
             rotation.Forward = dir;
             rotation.Up = normal;
