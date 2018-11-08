@@ -12,6 +12,11 @@ namespace TankGame
 {
      class Tank
     {
+        public enum PlayerMode{
+        AI,
+        PC
+        }
+        PlayerMode mode;
         float Speed = 3f;
         Vector3 pos;
         Model model;
@@ -28,7 +33,8 @@ namespace TankGame
         //Keeps all transforms
         Matrix[] boneTransforms;
 
-        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice) {
+        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode) {
+            mode = playermode;
             this.model = model;
             this.terrain = terrain;
 
@@ -53,63 +59,108 @@ namespace TankGame
 
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
-            if (keyboard.IsKeyDown(Keys.A))
-                yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (keyboard.IsKeyDown(Keys.D))
-                yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
             
-            Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
+            if (mode == PlayerMode.AI){
+                Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);
 
-            Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);
+                Vector3 NAB = ((((int)pos.Z + 1) - pos.Z) * normals[0] + (pos.Z - (int)pos.Z) * normals[1]);
+                Vector3 NCD = ((((int)pos.Z + 1) - pos.Z) * normals[2] + (pos.Z - (int)pos.Z) * normals[3]);
+                Vector3 normal = ((((int)pos.X + 1) - pos.X) * NAB + (pos.X - ((int)pos.X)) * NCD);
+                normal.Normalize();
 
-            Vector3 right = Vector3.Cross(dir, Vector3.Up);
+                Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));
+                dirH.Normalize();
 
-            if (keyboard.IsKeyDown(Keys.W))
-                pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (keyboard.IsKeyDown(Keys.S))
-                pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Vector3 right = Vector3.Cross(dirH, normal);
+                right.Normalize();
+                Vector3 dir = Vector3.Cross(normal, right);
+                dir.Normalize();
+                Matrix rotation = Matrix.Identity;
+                rotation.Forward = dir;
+                rotation.Up = normal;
+                rotation.Right = right;
+                if (pos.X < terrain.vertices[0].Position.X)                                         //
+                    pos.X = terrain.vertices[0].Position.X;                                         //
+                if (pos.Z < terrain.vertices[0].Position.Z)                                         //
+                    pos.Z = terrain.vertices[0].Position.Z;                                         //
+                if (pos.X > terrain.vertices[terrain.vertices.Length - 1].Position.X)               //
+                    pos.X = terrain.vertices[terrain.vertices.Length - 1].Position.X - 0.0001f;     //
+                if (pos.Z > terrain.vertices[terrain.vertices.Length - 1].Position.Z)               //
+                    pos.Z = terrain.vertices[terrain.vertices.Length - 1].Position.Z - 0.0001f;     //
 
-            if (pos.X < terrain.vertices[0].Position.X)                                         //
-                pos.X = terrain.vertices[0].Position.X;                                         //
-            if (pos.Z < terrain.vertices[0].Position.Z)                                         //
-                pos.Z = terrain.vertices[0].Position.Z;                                         //
-            if (pos.X > terrain.vertices[terrain.vertices.Length - 1].Position.X)               //
-                pos.X = terrain.vertices[terrain.vertices.Length - 1].Position.X - 0.0001f;     //
-            if (pos.Z > terrain.vertices[terrain.vertices.Length - 1].Position.Z)               //
-                pos.Z = terrain.vertices[terrain.vertices.Length - 1].Position.Z - 0.0001f;     //
+                Vector3[] vectors = terrain.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              //
+                float YA = vectors[0].Y;                                                            //
+                float YB = vectors[1].Y;                                                            //
+                float YC = vectors[2].Y;                                                            //
+                float YD = vectors[3].Y;                                                            //
+                float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          //
+                float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          //
+                pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD);          //
+                Matrix translation = Matrix.CreateTranslation(pos);
 
-            Vector3[] vectors = terrain.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              //
-            float YA = vectors[0].Y;                                                            //
-            float YB = vectors[1].Y;                                                            //
-            float YC = vectors[2].Y;                                                            //
-            float YD = vectors[3].Y;                                                            //
-            float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          //
-            float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          //
-            pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD);          //
+                model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;
+                model.CopyAbsoluteBoneTransformsTo(boneTransforms);
+            }
+            if (mode == PlayerMode.PC)
+            {
+                if (keyboard.IsKeyDown(Keys.A))
+                    yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (keyboard.IsKeyDown(Keys.D))
+                    yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);
+                Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
 
-            Vector3 NAB = ((((int)pos.Z + 1) - pos.Z) * normals[0] + (pos.Z - (int)pos.Z) * normals[1]);
-            Vector3 NCD = ((((int)pos.Z + 1) - pos.Z) * normals[2] + (pos.Z - (int)pos.Z) * normals[3]);
-            Vector3 normal = ((((int)pos.X + 1) - pos.X) * NAB + (pos.X - ((int)pos.X)) * NCD);
-            normal.Normalize();
+                Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);
 
-            Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));
-            dirH.Normalize();
+                Vector3 right = Vector3.Cross(dir, Vector3.Up);
 
-            right = Vector3.Cross(dirH, normal);
-            right.Normalize();
-            dir = Vector3.Cross(normal, right);
-            dir.Normalize();
-            rotation = Matrix.Identity;
-            rotation.Forward = dir;
-            rotation.Up = normal;
-            rotation.Right = right;
+                if (keyboard.IsKeyDown(Keys.W))
+                    pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (keyboard.IsKeyDown(Keys.S))
+                    pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Matrix translation = Matrix.CreateTranslation(pos);
+                if (pos.X < terrain.vertices[0].Position.X)                                         //
+                    pos.X = terrain.vertices[0].Position.X;                                         //
+                if (pos.Z < terrain.vertices[0].Position.Z)                                         //
+                    pos.Z = terrain.vertices[0].Position.Z;                                         //
+                if (pos.X > terrain.vertices[terrain.vertices.Length - 1].Position.X)               //
+                    pos.X = terrain.vertices[terrain.vertices.Length - 1].Position.X - 0.0001f;     //
+                if (pos.Z > terrain.vertices[terrain.vertices.Length - 1].Position.Z)               //
+                    pos.Z = terrain.vertices[terrain.vertices.Length - 1].Position.Z - 0.0001f;     //
 
-            model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;
-            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
+                Vector3[] vectors = terrain.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              //
+                float YA = vectors[0].Y;                                                            //
+                float YB = vectors[1].Y;                                                            //
+                float YC = vectors[2].Y;                                                            //
+                float YD = vectors[3].Y;                                                            //
+                float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          //
+                float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          //
+                pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD);          //
+
+                Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);
+
+                Vector3 NAB = ((((int)pos.Z + 1) - pos.Z) * normals[0] + (pos.Z - (int)pos.Z) * normals[1]);
+                Vector3 NCD = ((((int)pos.Z + 1) - pos.Z) * normals[2] + (pos.Z - (int)pos.Z) * normals[3]);
+                Vector3 normal = ((((int)pos.X + 1) - pos.X) * NAB + (pos.X - ((int)pos.X)) * NCD);
+                normal.Normalize();
+
+                Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));
+                dirH.Normalize();
+
+                right = Vector3.Cross(dirH, normal);
+                right.Normalize();
+                dir = Vector3.Cross(normal, right);
+                dir.Normalize();
+                rotation = Matrix.Identity;
+                rotation.Forward = dir;
+                rotation.Up = normal;
+                rotation.Right = right;
+
+                Matrix translation = Matrix.CreateTranslation(pos);
+
+                model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;
+                model.CopyAbsoluteBoneTransformsTo(boneTransforms);
+            }
         }
         public void Draw(Camera camera)
         {
