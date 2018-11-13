@@ -50,7 +50,6 @@ namespace TankGame
 
         public void Update(KeyboardState keyboard, GameTime gameTime)
         {
-            
             if (mode == PlayerMode.AI){
                 Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);                           //normais dos pontos onde o tank se encontra
 
@@ -103,8 +102,6 @@ namespace TankGame
 
                 Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
 
-                Vector3 right = Vector3.Cross(dir, Vector3.Up);                                                 //Vetor de direita do tank
-
                 if (keyboard.IsKeyDown(Keys.W))                                                                 //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
                 if (keyboard.IsKeyDown(Keys.S))                                                                 //
@@ -136,7 +133,7 @@ namespace TankGame
 
                 Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));                  //
                 dirH.Normalize();                                                                               //
-                right = Vector3.Cross(dirH, normal);                                                            //
+                Vector3 right = Vector3.Cross(dirH, normal);                                                    //
                 right.Normalize();                                                                              //
                 dir = Vector3.Cross(normal, right);                                                             //
                 dir.Normalize();                                                                                //Vetores axiais para calculo da rotação do tank
@@ -144,9 +141,7 @@ namespace TankGame
                 rotation.Forward = dir;                                                                         //
                 rotation.Up = normal;                                                                           //
                 rotation.Right = right;                                                                         //
-
                 Matrix translation = Matrix.CreateTranslation(pos);                                             //Translação do tank através da sua posição
-
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                             //
             }
