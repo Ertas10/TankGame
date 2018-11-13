@@ -42,10 +42,10 @@ namespace TankGame
             this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                                                        //
             this.terrain = terrain;                                                                                                         //terreno ao qual o tank está "bound"
 
-            turretBone = model.Bones["turret_geo"];                                     //bones da turret
-            cannonBone = model.Bones["canon_geo"];                                      //bones do canhão
-            turretTransform = turretBone.Transform;                                     //bone transforms da turret
-            cannonTransform = cannonBone.Transform;                                     //bone transforms do canhão
+            turretBone = model.Bones["turret_geo"];                                                                                         //bones da turret
+            cannonBone = model.Bones["canon_geo"];                                                                                          //bones do canhão
+            turretTransform = turretBone.Transform;                                                                                         //bone transforms da turret
+            cannonTransform = cannonBone.Transform;                                                                                         //bone transforms do canhão
         }
 
         public void Update(KeyboardState keyboard, GameTime gameTime)
