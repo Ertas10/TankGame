@@ -47,9 +47,9 @@ namespace TankGame
 
             boneTransforms = new Matrix[model.Bones.Count];                             //bone transforms do tank
 
-            model.Root.Transform = Matrix.CreateScale(scale) * Matrix.CreateRotationY(yaw) * Matrix.CreateTranslation(startingPos); //matriz inicial de posição, rotação e escala do tank
+            this.model.Root.Transform = Matrix.CreateScale(scale) * Matrix.CreateRotationY(yaw) * Matrix.CreateTranslation(startingPos); //matriz inicial de posição, rotação e escala do tank
 
-            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
+            this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);
             
 
         }
