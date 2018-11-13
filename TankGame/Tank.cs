@@ -32,26 +32,20 @@ namespace TankGame
         //Keeps all transforms
         Matrix[] boneTransforms;
 
-        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode) {
+        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
 
-            mode = playermode;                                                          //indica se o tank está em modo "AI" ou modo controlado por jogador
-            this.model = model;                                                         //modelo do tank
-            this.terrain = terrain;                                                     //terreno ao qual o tank está "bound"
-
-            pos = startingPos;                                                          //posição inicial do tank no terreno
+            pos = startingPos;                                                                                                              //posição inicial do tank no terreno
+            mode = playermode;                                                                                                              //indica se o tank está em modo "AI" ou modo controlado por jogador
+            this.model = model;                                                                                                             //modelo do tank
+            this.model.Root.Transform = Matrix.CreateScale(scale) * Matrix.CreateRotationY(yaw) * Matrix.CreateTranslation(startingPos);    //matriz inicial de posição, rotação e escala do tank
+            boneTransforms = new Matrix[model.Bones.Count];                                                                                 //bone transforms do tank
+            this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                                                        //
+            this.terrain = terrain;                                                                                                         //terreno ao qual o tank está "bound"
 
             turretBone = model.Bones["turret_geo"];                                     //bones da turret
             cannonBone = model.Bones["canon_geo"];                                      //bones do canhão
             turretTransform = turretBone.Transform;                                     //bone transforms da turret
             cannonTransform = cannonBone.Transform;                                     //bone transforms do canhão
-
-            boneTransforms = new Matrix[model.Bones.Count];                             //bone transforms do tank
-
-            this.model.Root.Transform = Matrix.CreateScale(scale) * Matrix.CreateRotationY(yaw) * Matrix.CreateTranslation(startingPos); //matriz inicial de posição, rotação e escala do tank
-
-            this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-            
-
         }
 
         public void Update(KeyboardState keyboard, GameTime gameTime)
