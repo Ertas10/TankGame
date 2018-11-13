@@ -34,11 +34,11 @@ namespace TankGame
 
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
 
-            this.pos = startingPos;                                                                                                              //posição inicial do tank no terreno
-            this.mode = playermode;                                                                                                              //indica se o tank está em modo "AI" ou modo controlado por jogador
+            this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
+            this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
             this.model = model;                                                                                                             //modelo do tank
             this.model.Root.Transform = Matrix.CreateScale(scale) * Matrix.CreateRotationY(yaw) * Matrix.CreateTranslation(startingPos);    //matriz inicial de posição, rotação e escala do tank
-            this.boneTransforms = new Matrix[model.Bones.Count];                                                                                 //bone transforms do tank
+            boneTransforms = new Matrix[model.Bones.Count];                                                                                 //bone transforms do tank
             this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                                                        //
             this.terrain = terrain;                                                                                                         //terreno ao qual o tank está "bound"
 
