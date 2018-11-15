@@ -31,6 +31,7 @@ namespace TankGame
         Matrix turretTransform;
         //Keeps all transforms
         Matrix[] boneTransforms;
+        float cannonRot = 0;
 
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
 
@@ -142,7 +143,21 @@ namespace TankGame
                 rotation.Up = normal;                                                                           //
                 rotation.Right = right;                                                                         //
                 Matrix translation = Matrix.CreateTranslation(pos);                                             //Translação do tank através da sua posição
+
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
+
+                if (keyboard.IsKeyDown(Keys.Left))                                                                                              //
+                    turretBone.Transform = Matrix.CreateRotationY(3f * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretBone.Transform;    //
+                if (keyboard.IsKeyDown(Keys.Right))                                                                                             //Rotação da torre do tank
+                    turretBone.Transform = Matrix.CreateRotationY(-3f * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretBone.Transform;   //
+
+                if (keyboard.IsKeyDown(Keys.Up))                                                                                                //
+                    cannonRot -= 4;                                                                                                             //
+                if (keyboard.IsKeyDown(Keys.Down))                                                                                              //Rotação do canhão do tank
+                    cannonRot += 4;                                                                                                             //
+                cannonRot = MathHelper.Clamp(cannonRot, -45, 25);                                                                               //
+                cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;      //
+
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                             //
             }
         }
