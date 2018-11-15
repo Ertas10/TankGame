@@ -12,6 +12,14 @@ namespace TankGame
 {
     class Camera
     {
+        public enum PlayerMode
+        {
+            CameraSurfaceFollow,
+            CameraFree,
+            CameraTank
+
+        }
+        PlayerMode mode;
         Vector3 pos;
         Vector3 target;
         public Matrix viewMatrix;
@@ -46,62 +54,119 @@ namespace TankGame
         }
 
         public void Update(KeyboardState keyboard, MouseState mouse, GameTime gameTime){
+            if (keyboard.IsKeyDown(Keys.F1)) mode = PlayerMode.CameraSurfaceFollow;
+            if (keyboard.IsKeyDown(Keys.F2)) mode = PlayerMode.CameraFree;
+            
+            if (mode == PlayerMode.CameraSurfaceFollow)
+            {
+                int centroX = graphicsDevice.Viewport.Width / 2;
+                int centroY = graphicsDevice.Viewport.Height / 2;
 
-            int centroX = graphicsDevice.Viewport.Width / 2;
-            int centroY = graphicsDevice.Viewport.Height / 2;
+                int deltaX = mouse.X - centroX;
+                int deltaY = mouse.Y - centroY;
+                yaw = yaw - deltaX * escalaRadianosPorPixel;
+                pitch = pitch - deltaY * escalaRadianosPorPixel;
+                pitch = MathHelper.Clamp(pitch, -1, 1);
+                Matrix rotacao = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
 
-            int deltaX = mouse.X - centroX;
-            int deltaY = mouse.Y - centroY;
-            yaw = yaw - deltaX * escalaRadianosPorPixel;
-            pitch = pitch - deltaY * escalaRadianosPorPixel;
-            pitch = MathHelper.Clamp(pitch, -1, 1);
-            Matrix rotacao = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
+                Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotacao);
 
-            Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotacao);
+                Vector3 right = Vector3.Cross(dir, Vector3.Up);
 
-            Vector3 right = Vector3.Cross(dir, Vector3.Up);
+                if (keyboard.IsKeyDown(Keys.NumPad8))
+                {                                               //
+                    pos = pos + dir * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
+                }                                                                                   //
+                if (keyboard.IsKeyDown(Keys.NumPad5))
+                {                                               //
+                    pos = pos - dir * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
+                }                                                                                   // Controlo de movimento da camara
+                if (keyboard.IsKeyDown(Keys.NumPad4))
+                {                                               //
+                    pos = pos - right * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds; //
+                }                                                                                   //
+                if (keyboard.IsKeyDown(Keys.NumPad6))
+                {                                               //
+                    pos = pos + right * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds; //
+                }
 
-            if(keyboard.IsKeyDown(Keys.NumPad8)){                                               //
-                pos = pos + dir * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
-            }                                                                                   //
-            if(keyboard.IsKeyDown(Keys.NumPad5)){                                               //
-                pos = pos - dir * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
-            }                                                                                   // Controlo de movimento da camara
-            if(keyboard.IsKeyDown(Keys.NumPad4)){                                               //
-                pos = pos - right * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds; //
-            }                                                                                   //
-            if(keyboard.IsKeyDown(Keys.NumPad6)){                                               //
-                pos = pos + right * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds; //
+                if (pos.X < terreno.vertices[0].Position.X)                                         //
+                    pos.X = terreno.vertices[0].Position.X;                                         //
+                if (pos.Z < terreno.vertices[0].Position.Z)                                         //
+                    pos.Z = terreno.vertices[0].Position.Z;                                         // Mantém a camara dentro dos limites do terreno
+                if (pos.X > terreno.vertices[terreno.vertices.Length - 1].Position.X)               //
+                    pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 0.0001f;           //
+                if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.Z)               //
+                    pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 0.0001f;           //
+
+                Vector3[] vectors = terreno.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              // Vai buscar os vetores que circulam a camara
+
+                float YA = vectors[0].Y;                                                            //
+                float YB = vectors[1].Y;                                                            // Posição Y de cada vetor
+                float YC = vectors[2].Y;                                                            //
+                float YD = vectors[3].Y;                                                            //
+
+
+                float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          // Interpolação do Y entre A e B
+                float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          // Interpolação do Y entre C e D
+
+                pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) + 2f;    // Interpolação final para encontrar novo Y da camara, adicionando 2 à altura para não haver clipping
+
+                target = pos + dir;                                                                 // Atualiza o target
+
+                viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);                          // Atualiza a viewMatrix
+
+                Mouse.SetPosition(centroX, centroY);                                                // Coloca o cursor no centro do ecrã
+            }
+            if (mode == PlayerMode.CameraFree)
+            {
+
+                //primeira coisa a ver é quanto o rato andou , mas apenas sabemos a posição dele, podemos tambem no fim da frame o rato sempre a meio da janela portanto prendemos o rato a meio da janela
+                //neste caso o rato não mexe por isso usamos o device
+                int centroX = graphicsDevice.Viewport.Width / 2
+                    , centroY = graphicsDevice.Viewport.Height / 2;
+                int deltaX = mouse.X - centroX;//é a nova posição do x - o centro do x
+                yaw = yaw - deltaX * escalaRadianosPorPixel;
+                int deltaY = mouse.Y - centroY;
+                pitch += deltaY * escalaRadianosPorPixel;
+                Matrix rotacao = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);   //criar uma rotação
+                Vector3 dir = Vector3.Transform(Vector3.UnitZ/*é um vetor base ,direção inicial olhar para frente*/, rotacao/*vetor rotação*/);//transformar vetor base(naão a yaw nem pitch) com a rotação
+
+
+
+                Vector3 right = Vector3.Cross(dir, Vector3.Up);//cross do vetor que estamos a andar com a vertical
+                                                               //atualização da posição
+
+                target = pos + dir;
+                this.viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);
+
+                Mouse.SetPosition(centroX, centroY);
+                float vel = 30;
+                if (keyboard.IsKeyDown(Keys.NumPad8))
+                {
+                    pos = pos + dir * vel * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+
+
+                if (keyboard.IsKeyDown(Keys.NumPad5))
+                {
+                    pos = pos - dir * vel * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                if (keyboard.IsKeyDown(Keys.NumPad4))
+                {
+                    pos = pos - right * vel * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                if (keyboard.IsKeyDown(Keys.NumPad6))
+                {
+                    pos = pos + right * vel * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+
+            }
+            if (mode == PlayerMode.CameraTank)
+            {
             }
 
-            if (pos.X < terreno.vertices[0].Position.X)                                         //
-                pos.X = terreno.vertices[0].Position.X;                                         //
-            if (pos.Z < terreno.vertices[0].Position.Z)                                         //
-                pos.Z = terreno.vertices[0].Position.Z;                                         // Mantém a camara dentro dos limites do terreno
-            if (pos.X > terreno.vertices[terreno.vertices.Length - 1].Position.X)               //
-                pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 0.0001f;           //
-            if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.Z)               //
-                pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 0.0001f;           //
-
-            Vector3[] vectors = terreno.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              // Vai buscar os vetores que circulam a camara
-
-            float YA = vectors[0].Y;                                                            //
-            float YB = vectors[1].Y;                                                            // Posição Y de cada vetor
-            float YC = vectors[2].Y;                                                            //
-            float YD = vectors[3].Y;                                                            //
-
-
-            float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          // Interpolação do Y entre A e B
-            float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          // Interpolação do Y entre C e D
-
-            pos.Y =  ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) + 2f;    // Interpolação final para encontrar novo Y da camara, adicionando 2 à altura para não haver clipping
-            
-            target = pos + dir;                                                                 // Atualiza o target
-
-            viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);                          // Atualiza a viewMatrix
-
-            Mouse.SetPosition(centroX, centroY);                                                // Coloca o cursor no centro do ecrã
-        }
+            }
 
 
     }
