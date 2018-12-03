@@ -56,8 +56,8 @@ namespace TankGame
                 Exit();
             
             camera.Update(Keyboard.GetState(), Mouse.GetState(), gameTime);
-            tank.Update(Keyboard.GetState(), gameTime, tank, c, enemytanks);
-            tankAI.Update(Keyboard.GetState(), gameTime, tank, c, enemytanks);
+            tank.Update(Keyboard.GetState(), gameTime, tank, c, enemytanks, GraphicsDevice);
+            tankAI.Update(Keyboard.GetState(), gameTime, tank, c, enemytanks, GraphicsDevice);
 
             base.Update(gameTime);
         }

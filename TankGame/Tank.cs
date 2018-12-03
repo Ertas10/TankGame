@@ -34,9 +34,10 @@ namespace TankGame
         float cannonRot = 0f;
         float tankangle = 0f;
         GenerateParticle dustcloud;
+        ParticleSystem particleSystem;
 
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
-
+            particleSystem = new ParticleSystem(Color.SandyBrown, 2, 1, terrain);
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
             this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
             this.model = model;                                                                                                             //modelo do tank
@@ -52,7 +53,7 @@ namespace TankGame
             dustcloud = new GenerateParticle(graphicsDevice, pos);
         }
 
-        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager c, List<Tank> enemytanks)
+        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager c, List<Tank> enemytanks, GraphicsDevice device)
         {
             if (mode == PlayerMode.AI){
                 
@@ -113,12 +114,14 @@ namespace TankGame
                 if (keyboard.IsKeyDown(Keys.W))
                 {                                                                                               //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
-                    dustcloud.CreateCloud(pos, sp);
+                    particleSystem.AddParticles(device, pos, -dir);
+                    //dustcloud.CreateCloud(pos, sp, device);
                 }
                 if (keyboard.IsKeyDown(Keys.S))
                 {                                                                                               //
                     pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //
-                    dustcloud.CreateCloud(pos, sp);
+                    particleSystem.AddParticles(device, pos, dir);
+                    //dustcloud.CreateCloud(pos, sp, device);
                 }
                 if (pos.X < terrain.vertices[0].Position.X)                                                     //
                     pos.X = terrain.vertices[0].Position.X;                                                     //
@@ -171,7 +174,8 @@ namespace TankGame
                 cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;      //
 
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-                dustcloud.Update();                                                                                                  //
+                //dustcloud.Update();                                                                                                  //
+                particleSystem.Update(gameTime, device);
             }
         }
         
@@ -193,7 +197,8 @@ namespace TankGame
                     effect.AmbientLightColor = camera.effect.AmbientLightColor;
                 }
                 mesh.Draw();
-                dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
+                particleSystem.Draw(device, camera);
+                //dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
             }
 
         }

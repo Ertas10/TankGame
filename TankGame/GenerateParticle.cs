@@ -24,9 +24,9 @@ namespace TankGame
             this.center = position;
         }
 
-        public void CreateCloud(Vector3 position, Vector3 speed)
+        public void CreateCloud(Vector3 position, Vector3 speed, GraphicsDevice device)
         {
-            density = (int)(radiuscloud * 250f);
+            density = (int)(radiuscloud * 30);
 
             for (int i = 0; i < density; i++)
             {
@@ -39,10 +39,10 @@ namespace TankGame
                         (rnd.Next(-density, density) * radiuscloud) / density + position.Z - 1f);
                 }
                 while (Vector3.Distance(particleL, position) > radiuscloud || Vector3.Distance(particleR, position) > radiuscloud);
-                int ttl = 20 + rnd.Next(40);
+                int ttl = 500 + rnd.Next(100);
 
-                dustL.Add(new DustParticle(particleL, ttl, speed));
-                dustR.Add(new DustParticle(particleR, ttl, speed));
+                dustL.Add(new DustParticle(device, particleL, ttl, speed));
+                dustR.Add(new DustParticle(device, particleR, ttl, speed));
             }
         }
 
@@ -79,10 +79,10 @@ namespace TankGame
             effect.CurrentTechnique.Passes[0].Apply();
 
             foreach (DustParticle d in dustL)
-                d.Draw(device);
+                d.Draw(device, camera);
 
             foreach (DustParticle d in dustR)
-                d.Draw(device);
+                d.Draw(device, camera);
         }
     }
 }
