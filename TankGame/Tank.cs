@@ -34,7 +34,6 @@ namespace TankGame
         float cannonRot = 0;
 
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
-
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
             this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
             this.model = model;                                                                                                             //modelo do tank
@@ -49,8 +48,7 @@ namespace TankGame
             cannonTransform = cannonBone.Transform;                                                                                         //bone transforms do canhão
         }
 
-        public void Update(KeyboardState keyboard, GameTime gameTime)
-        {
+        public void Update(KeyboardState keyboard, GameTime gameTime){
             if (mode == PlayerMode.AI){
                 Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);                           //normais dos pontos onde o tank se encontra
 
@@ -158,7 +156,7 @@ namespace TankGame
                 cannonRot = MathHelper.Clamp(cannonRot, -45, 25);                                                                               //
                 cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;      //
 
-                model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                             //
+                model.CopyAbsoluteBoneTransformsTo(boneTransforms);
             }
         }
         public void Draw(Camera camera)
@@ -166,7 +164,7 @@ namespace TankGame
             foreach (ModelMesh mesh in model.Meshes)
             {
                 foreach(BasicEffect effect in mesh.Effects){
-                   // effect.World = worldMatrix;
+                    // effect.World = worldMatrix;
                     effect.World = boneTransforms[mesh.ParentBone.Index];
                     effect.View = camera.viewMatrix;
                     //effect.Projection = camera.projection;
