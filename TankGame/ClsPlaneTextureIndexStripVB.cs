@@ -9,7 +9,7 @@ namespace TankGame
         VertexBuffer vertexBufferFaces;
         IndexBuffer indexBufferFaces;
         BasicEffect effect;
-        Matrix worldMatrix;
+        public Matrix worldMatrix;
         public Texture2D terreno;
         Texture2D textura;
         int vertexCount;
@@ -290,9 +290,7 @@ namespace TankGame
             // Indica o efeito para desenhar os eixos
             effect.CurrentTechnique.Passes[0].Apply();
             effect.Texture = this.textura;
-
-
-
+            
             device.SetVertexBuffer(vertexBufferFaces);
             device.Indices = indexBufferFaces;
             for (int i = 0; i < terreno.Width-1; i++)
