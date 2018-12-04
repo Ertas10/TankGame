@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ namespace TankGame
         public Vector3 pos;
         Model model;
         ClsPlaneTextureIndexStripVB terrain;
-        float yaw = 0;
+        public float yaw = 0;
         //Bones
         ModelBone turretBone, cannonBone;
         //matrixes
@@ -34,10 +35,10 @@ namespace TankGame
         float cannonRot = 0f;
         float tankangle = 0f;
         GenerateParticle dustcloud;
-        ParticleSystem particleSystem;
-
+        public Matrix rotation;
+        public Matrix translation;
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
-            particleSystem = new ParticleSystem(Color.SandyBrown, 2, 1, terrain);
+
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
             this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
             this.model = model;                                                                                                             //modelo do tank
@@ -53,7 +54,7 @@ namespace TankGame
             dustcloud = new GenerateParticle(graphicsDevice, pos);
         }
 
-        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager c, List<Tank> enemytanks, GraphicsDevice device)
+        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager c, List<Tank> enemytanks)
         {
             if (mode == PlayerMode.AI){
                 
@@ -65,7 +66,7 @@ namespace TankGame
                 normal.Normalize();                                                                             //
 
 
-                Matrix rotation = Matrix.Identity;
+                rotation = Matrix.Identity;
                 Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));                  //
                 dirH.Normalize();                                                                               //
                 Vector3 right = Vector3.Cross(dirH, normal);                                                    //
@@ -102,26 +103,29 @@ namespace TankGame
             }
             if (mode == PlayerMode.PC)
             {
-                if (keyboard.IsKeyDown(Keys.A))                                                                 //
-                    yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;                                   //Calculo do yaw
-                if (keyboard.IsKeyDown(Keys.D))                                                                 //
-                    yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;                                   //
+                if (keyboard.IsKeyDown(Keys.A))
+                {                                                                                                //
+                    yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                  
+                }                                                                                                //Calculo do yaw
+                if (keyboard.IsKeyDown(Keys.D))
+                {                                                                                                //
+                    yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }                                                                                                //
 
-                Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);                                     //Rotação para movimentaçao do tank
+                rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);                                     //Rotação para movimentaçao do tank
 
                 Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
                 Vector3 sp = new Vector3(0.1f, 0.01f, 0f);
                 if (keyboard.IsKeyDown(Keys.W))
                 {                                                                                               //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
-                    particleSystem.AddParticles(device, pos, -dir);
-                    //dustcloud.CreateCloud(pos, sp, device);
+                    dustcloud.CreateCloud(pos, sp);
                 }
                 if (keyboard.IsKeyDown(Keys.S))
                 {                                                                                               //
                     pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //
-                    particleSystem.AddParticles(device, pos, dir);
-                    //dustcloud.CreateCloud(pos, sp, device);
+                    dustcloud.CreateCloud(pos, sp);
                 }
                 if (pos.X < terrain.vertices[0].Position.X)                                                     //
                     pos.X = terrain.vertices[0].Position.X;                                                     //
@@ -157,7 +161,7 @@ namespace TankGame
                 rotation.Forward = dir;                                                                         //
                 rotation.Up = normal;                                                                           //
                 rotation.Right = right;                                                                         //
-                Matrix translation = Matrix.CreateTranslation(pos);                                             //Translação do tank através da sua posição
+                translation = Matrix.CreateTranslation(pos);                                             //Translação do tank através da sua posição
 
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
 
@@ -174,8 +178,7 @@ namespace TankGame
                 cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;      //
 
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-                //dustcloud.Update();                                                                                                  //
-                particleSystem.Update(gameTime, device);
+                dustcloud.Update();                                                                                                  //
             }
         }
         
@@ -197,8 +200,7 @@ namespace TankGame
                     effect.AmbientLightColor = camera.effect.AmbientLightColor;
                 }
                 mesh.Draw();
-                particleSystem.Draw(device, camera);
-                //dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
+                dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
             }
 
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -24,9 +25,9 @@ namespace TankGame
             this.center = position;
         }
 
-        public void CreateCloud(Vector3 position, Vector3 speed, GraphicsDevice device)
+        public void CreateCloud(Vector3 position, Vector3 speed)
         {
-            density = (int)(radiuscloud * 30);
+            density = (int)(radiuscloud * 250f);
 
             for (int i = 0; i < density; i++)
             {
@@ -39,10 +40,10 @@ namespace TankGame
                         (rnd.Next(-density, density) * radiuscloud) / density + position.Z - 1f);
                 }
                 while (Vector3.Distance(particleL, position) > radiuscloud || Vector3.Distance(particleR, position) > radiuscloud);
-                int ttl = 500 + rnd.Next(100);
+                int ttl = 20 + rnd.Next(40);
 
-                dustL.Add(new DustParticle(device, particleL, ttl, speed));
-                dustR.Add(new DustParticle(device, particleR, ttl, speed));
+                dustL.Add(new DustParticle(particleL, ttl, speed));
+                dustR.Add(new DustParticle(particleR, ttl, speed));
             }
         }
 
@@ -79,10 +80,11 @@ namespace TankGame
             effect.CurrentTechnique.Passes[0].Apply();
 
             foreach (DustParticle d in dustL)
-                d.Draw(device, camera);
+                d.Draw(device);
 
             foreach (DustParticle d in dustR)
-                d.Draw(device, camera);
+                d.Draw(device);
         }
     }
 }
+

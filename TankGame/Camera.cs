@@ -20,7 +20,7 @@ namespace TankGame
 
         }
         PlayerMode mode;
-        Vector3 pos;
+        public Vector3 pos;
         Vector3 target;
         public Matrix viewMatrix;
         public Matrix projection;
@@ -33,6 +33,7 @@ namespace TankGame
         public BasicEffect effect;
 
         public Camera(GraphicsDevice graphicsDevice, ClsPlaneTextureIndexStripVB terreno){
+            
             float aspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
             projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(90.0f), aspectRatio, 0.2f, 1000.0f);
             pos = new Vector3(15, 10, 10);
@@ -53,10 +54,10 @@ namespace TankGame
             effect.VertexColorEnabled = false;
         }
 
-        public void Update(KeyboardState keyboard, MouseState mouse, GameTime gameTime){
+        public void Update(KeyboardState keyboard, MouseState mouse, GameTime gameTime, Tank tank1){
             if (keyboard.IsKeyDown(Keys.F1)) mode = PlayerMode.CameraSurfaceFollow;
             if (keyboard.IsKeyDown(Keys.F2)) mode = PlayerMode.CameraFree;
-            
+            if (keyboard.IsKeyDown(Keys.F3)) mode = PlayerMode.CameraTank;
             if (mode == PlayerMode.CameraSurfaceFollow)
             {
                 int centroX = graphicsDevice.Viewport.Width / 2;
@@ -160,12 +161,24 @@ namespace TankGame
                 {
                     pos = pos + right * vel * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
+                if (keyboard.IsKeyDown(Keys.NumPad7))
+                {
+                    pos.Y += 0.5f;
+                }
+                if (keyboard.IsKeyDown(Keys.NumPad1))
+                {
+                    pos.Y -= 0.5f;
+                }
 
             }
             if (mode == PlayerMode.CameraTank)
             {
+                Vector3 cameraTarget = tank1.translation.Translation + (viewMatrix.Forward );
+                pos = tank1.pos + (viewMatrix.Backward * -1)  + (viewMatrix.Up * 4) + (viewMatrix.Left * -1);
+                Matrix rotacao = Matrix.CreateFromYawPitchRoll(tank1.yaw, pitch, 0);
+                viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.UnitY);
             }
-
+            
             }
 
 
