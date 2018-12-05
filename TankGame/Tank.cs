@@ -32,11 +32,12 @@ namespace TankGame
         Matrix turretTransform;
         //Keeps all transforms
         Matrix[] boneTransforms;
-        float cannonRot = 0f;
-        float tankangle = 0f;
+        public float cannonRot = 0f;
+        public float tankangle = 0f;
         GenerateParticle dustcloud;
         public Matrix rotation;
         public Matrix translation;
+        public List<Bullets> bullets;
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
 
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
@@ -47,6 +48,8 @@ namespace TankGame
             this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                                                        //
             this.terrain = terrain;                                                                                                         //terreno ao qual o tank está "bound"
 
+            bullets = new List<Bullets>();
+
             turretBone = model.Bones["turret_geo"];                                                                                         //bones da turret
             cannonBone = model.Bones["canon_geo"];                                                                                          //bones do canhão
             turretTransform = turretBone.Transform;                                                                                         //bone transforms da turret
@@ -54,8 +57,20 @@ namespace TankGame
             dustcloud = new GenerateParticle(graphicsDevice, pos);
         }
 
-        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager c, List<Tank> enemytanks)
+        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager content, List<Tank> enemytanks)
         {
+
+
+            for (int i = 0; i < bullets.Count; i++) //each tanks bullets ground or walls
+            {
+                bullets[i].Update(gameTime);
+                //if (bullets[i].HitGround(bullets[i].position, terrain.terreno.Height))
+                //{
+                //    bullets.Remove(bullets[i]);
+                //}
+            }
+
+
             if (mode == PlayerMode.AI){
                 
                 Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);                           //normais dos pontos onde o tank se encontra
@@ -103,6 +118,14 @@ namespace TankGame
             }
             if (mode == PlayerMode.PC)
             {
+
+                if (keyboard.IsKeyDown(Keys.Space))
+                {
+                        fire(content);
+                      
+                }
+
+
                 if (keyboard.IsKeyDown(Keys.A)){                                                                                                //
                     yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }                                                                                                //Calculo do yaw
@@ -176,7 +199,18 @@ namespace TankGame
                 dustcloud.Update();                                                                                                  //
             }
         }
-        
+
+
+
+        public void fire(ContentManager c)//change position to look like coming from cannon
+        {
+            Bullets b = new Bullets(c, pos, terrain, cannonRot, turretTransform * Matrix.CreateRotationY(yaw), tankangle);
+            bullets.Add(b);
+        }
+
+
+
+
         public void Draw(Camera camera, GraphicsDevice device)
         {
             foreach (ModelMesh mesh in model.Meshes)
@@ -196,6 +230,10 @@ namespace TankGame
                 }
                 mesh.Draw();
                 dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
+            }
+            foreach (Bullets b in bullets)
+            {
+                b.Draw(camera);
             }
 
         }

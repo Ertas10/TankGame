@@ -70,6 +70,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Bullets.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Cls3DAxis.cs" />
     <Compile Include="ClsPlaneTextureIndexStripVB.cs" />

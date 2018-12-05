@@ -19,7 +19,6 @@ namespace TankGame
         ClsPlaneTextureIndexStripVB terrain;
         Tank tank;
         Tank tankAI;
-        ContentManager c;
         List<Tank> enemytanks;
 
         public Game1()
@@ -43,7 +42,6 @@ namespace TankGame
             camera = new Camera(GraphicsDevice, terrain);
             tank = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(15, 15, 15), GraphicsDevice, Tank.PlayerMode.PC);
             tankAI = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(90, 90, 90), GraphicsDevice, Tank.PlayerMode.AI);
-            
         }
 
         protected override void UnloadContent()
@@ -55,9 +53,9 @@ namespace TankGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             
-            tank.Update(Keyboard.GetState(), gameTime, tank, c, enemytanks);
+            tank.Update(Keyboard.GetState(), gameTime, tank, Content, enemytanks);
             camera.Update(Keyboard.GetState(), Mouse.GetState(), gameTime, tank);
-            tankAI.Update(Keyboard.GetState(), gameTime, tank, c, enemytanks);
+            tankAI.Update(Keyboard.GetState(), gameTime, tank, Content, enemytanks);
 
             base.Update(gameTime);
         }
