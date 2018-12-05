@@ -25,7 +25,7 @@ namespace TankGame
         public float yaw = 0;
         //Bones
         ModelBone turretBone, cannonBone;
-        //matrixes
+        //matrices
         float scale = 0.005f;
         //Default Transforms
         Matrix cannonTransform;
@@ -103,13 +103,10 @@ namespace TankGame
             }
             if (mode == PlayerMode.PC)
             {
-                if (keyboard.IsKeyDown(Keys.A))
-                {                                                                                                //
+                if (keyboard.IsKeyDown(Keys.A)){                                                                                                //
                     yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                  
                 }                                                                                                //Calculo do yaw
-                if (keyboard.IsKeyDown(Keys.D))
-                {                                                                                                //
+                if (keyboard.IsKeyDown(Keys.D)){                                                                                                //
                     yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }                                                                                                //
 
@@ -117,13 +114,11 @@ namespace TankGame
 
                 Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
                 Vector3 sp = new Vector3(0.1f, 0.01f, 0f);
-                if (keyboard.IsKeyDown(Keys.W))
-                {                                                                                               //
+                if (keyboard.IsKeyDown(Keys.W)){                                                                                               //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
                     dustcloud.CreateCloud(pos, sp);
                 }
-                if (keyboard.IsKeyDown(Keys.S))
-                {                                                                                               //
+                if (keyboard.IsKeyDown(Keys.S)){                                                                                               //
                     pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //
                     dustcloud.CreateCloud(pos, sp);
                 }
