@@ -31,14 +31,15 @@ namespace TankGame
         ClsPlaneTextureIndexStripVB terreno;
         float cameraSpeed = 5;
         public BasicEffect effect;
-
+        Matrix rotacao;
+        bool teste;
         public Camera(GraphicsDevice graphicsDevice, ClsPlaneTextureIndexStripVB terreno){
-            
+            teste = false;
             float aspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
             projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(90.0f), aspectRatio, 0.2f, 1000.0f);
             pos = new Vector3(15, 10, 10);
             target = Vector3.UnitZ;
-            yaw = 0;
+            yaw = 10;
             pitch = 0;
             viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);
             this.graphicsDevice = graphicsDevice;
@@ -55,9 +56,9 @@ namespace TankGame
         }
 
         public void Update(KeyboardState keyboard, MouseState mouse, GameTime gameTime, Tank tank1){
-            if (keyboard.IsKeyDown(Keys.F1)) mode = PlayerMode.CameraSurfaceFollow;
+            if (keyboard.IsKeyDown(Keys.F3)) mode = PlayerMode.CameraSurfaceFollow;
             if (keyboard.IsKeyDown(Keys.F2)) mode = PlayerMode.CameraFree;
-            if (keyboard.IsKeyDown(Keys.F3)) mode = PlayerMode.CameraTank;
+            if (keyboard.IsKeyDown(Keys.F1)) mode = PlayerMode.CameraTank;
             if (mode == PlayerMode.CameraSurfaceFollow)
             {
                 int centroX = graphicsDevice.Viewport.Width / 2;
@@ -173,10 +174,26 @@ namespace TankGame
             }
             if (mode == PlayerMode.CameraTank)
             {
-                Vector3 cameraTarget = tank1.translation.Translation + (viewMatrix.Forward );
-                pos = tank1.pos + (viewMatrix.Backward * -1)  + (viewMatrix.Up * 4) + (viewMatrix.Left * -1);
-                Matrix rotacao = Matrix.CreateFromYawPitchRoll(tank1.yaw, pitch, 0);
-                viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.UnitY);
+
+                if (keyboard.IsKeyDown(Keys.A))
+                {                                                                                                //
+                    yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                }                                                                                                //Calculo do yaw
+                if (keyboard.IsKeyDown(Keys.D))
+                {                                                                                                //
+                    yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                
+                rotacao = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
+                Vector3 cameraTarget = Vector3.Transform( pos, rotacao);
+                if (teste != true)
+                {
+                    pos = tank1.pos + (viewMatrix.Backward *5)  + (viewMatrix.Up * 2);
+                    teste = true;
+                }
+                pos = tank1.pos /*+ (viewMatrix.Backward *5) */ + (viewMatrix.Up * 2) ;
+                this.viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.Up);
             }
             
             }
