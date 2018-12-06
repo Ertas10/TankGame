@@ -59,7 +59,7 @@ namespace TankGame
             dustcloud = new GenerateParticle(graphicsDevice, pos);
         }
 
-        public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager content, List<Tank> enemytanks)
+        public void Update(KeyboardState keyboard, GameTime gameTime,  ContentManager content, Tank otherTank, Camera camara)
         {
             for (int i = 0; i < bullets.Count; i++) //each tanks bullets ground or walls
             {
@@ -72,7 +72,36 @@ namespace TankGame
 
 
             if (mode == PlayerMode.AI){
-                
+
+                Vector3 sp = new Vector3(0.1f, 0, 0);
+                if ((pos - sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {//limite
+                    
+                        pos -= sp;
+                        dustcloud.CreateCloud(pos, sp);
+                    
+                }
+                //inimigo pra trás
+                else if ((pos + sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {//limite
+                    
+                        pos += sp;
+                        dustcloud.CreateCloud(pos, sp);
+                    
+                }
+                //inimigo direita
+                if ((Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(+0.025f));
+                }
+                //inimigo esquerda
+                else if ((-Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(-0.025f));
+                }
+
+
+
                 Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);                           //normais dos pontos onde o tank se encontra
 
                 Vector3 NAB = ((((int)pos.Z + 1) - pos.Z) * normals[0] + (pos.Z - (int)pos.Z) * normals[1]);    //
@@ -181,7 +210,7 @@ namespace TankGame
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
 
                 if (keyboard.IsKeyDown(Keys.Left))                                                                                              //
-                    turretRot += 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;    //
+                   turretRot += 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;    //
                 if (keyboard.IsKeyDown(Keys.Right))                                                                                             //Rotação da torre do tank
                     turretRot -= 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
                 if (keyboard.IsKeyDown(Keys.Up))                                                                                                //

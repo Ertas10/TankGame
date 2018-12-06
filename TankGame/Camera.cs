@@ -191,10 +191,10 @@ namespace TankGame
                 Vector3 cameraTarget = pos + dir;
                 if (teste != true)
                 {
-                    pos = tank1.pos + (viewMatrix.Backward *5)  + (viewMatrix.Up * 2);
+                    pos = tank1.pos + (viewMatrix.Backward *-5)  + (viewMatrix.Up * 2);
                     teste = true;
                 }
-                pos = tank1.pos  + (viewMatrix.Up * 2.5f);
+                pos = tank1.pos  + (viewMatrix.Up * 2.5f) ;
                 this.viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.Up);
             }
             
