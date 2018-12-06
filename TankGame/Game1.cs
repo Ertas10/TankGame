@@ -35,7 +35,7 @@ namespace TankGame
         protected override void LoadContent()
         {
             enemytanks = new List<Tank>();
-            enemytanks.Add(tankAI = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(90, 90, 90), GraphicsDevice, Tank.PlayerMode.AI));
+            enemytanks.Add(tankAI = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(90, 90, 90), GraphicsDevice, Tank.PlayerMode.AI, 2));
             Cls3DAxis = new Cls3DAxis(GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             terrain = new ClsPlaneTextureIndexStripVB(GraphicsDevice, 0.2f, Content.Load<Texture2D>("terreno"), Content.Load<Texture2D>("textura"));

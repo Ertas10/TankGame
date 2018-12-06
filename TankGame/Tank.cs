@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +10,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace TankGame
 {
-     class Tank
+    class Tank
     {
         public enum PlayerMode{
         AI,
@@ -40,6 +39,7 @@ namespace TankGame
         public Matrix rotation;
         public Matrix translation;
         public List<Bullets> bullets;
+
         public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode, int ID){
 
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
@@ -61,8 +61,6 @@ namespace TankGame
 
         public void Update(KeyboardState keyboard, GameTime gameTime, Tank playertanks, ContentManager content, List<Tank> enemytanks)
         {
-
-
             for (int i = 0; i < bullets.Count; i++) //each tanks bullets ground or walls
             {
                 bullets[i].Update(gameTime);
@@ -120,7 +118,6 @@ namespace TankGame
             }
             if (mode == PlayerMode.PC)
             {
-
                 if (keyboard.IsKeyDown(Keys.Space)){
                         Fire(content);    
                 }
@@ -199,8 +196,6 @@ namespace TankGame
                 dustcloud.Update();                                                                                                  //
             }
         }
-
-
 
         public void Fire(ContentManager c)//change position to look like coming from cannon
         {

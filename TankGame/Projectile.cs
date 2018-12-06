@@ -17,6 +17,8 @@ namespace TankGame
         Vector3 vertical;
         Vector3 pos;
         ClsPlaneTextureIndexStripVB ground;
+        Matrix translation;
+        Matrix rotation;
 
         public Projectile(Model model, Vector3 horizontalAngle, Vector3 verticalAngle, Vector3 pos, ClsPlaneTextureIndexStripVB ground, int ParentID){
             this.model = model;
