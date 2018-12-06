@@ -31,7 +31,7 @@ namespace TankGame
             world = Matrix.Identity;
             this.Ground = ground;
             this.position = position;
-
+            
             dir = viewMatrix.Forward;
             rotation = viewMatrix * Matrix.CreateRotationY(1.5708f);
             rotation *= Matrix.CreateFromAxisAngle(rotation.Right, -angle);

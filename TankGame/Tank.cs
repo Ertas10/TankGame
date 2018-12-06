@@ -17,6 +17,7 @@ namespace TankGame
         AI,
         PC
         }
+        int id;
         PlayerMode mode;
         float Speed = 3f;
         public Vector3 pos;
@@ -33,12 +34,13 @@ namespace TankGame
         //Keeps all transforms
         Matrix[] boneTransforms;
         public float cannonRot = 0f;
+        public float turretRot = 0f;
         public float tankangle = 0f;
         GenerateParticle dustcloud;
         public Matrix rotation;
         public Matrix translation;
         public List<Bullets> bullets;
-        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode){
+        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode, int ID){
 
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
             this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
@@ -47,7 +49,7 @@ namespace TankGame
             boneTransforms = new Matrix[model.Bones.Count];                                                                                 //bone transforms do tank
             this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                                                        //
             this.terrain = terrain;                                                                                                         //terreno ao qual o tank está "bound"
-
+            this.id = ID;
             bullets = new List<Bullets>();
 
             turretBone = model.Bones["turret_geo"];                                                                                         //bones da turret
@@ -119,10 +121,8 @@ namespace TankGame
             if (mode == PlayerMode.PC)
             {
 
-                if (keyboard.IsKeyDown(Keys.Space))
-                {
-                        fire(content);
-                      
+                if (keyboard.IsKeyDown(Keys.Space)){
+                        Fire(content);    
                 }
 
 
@@ -184,17 +184,17 @@ namespace TankGame
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
 
                 if (keyboard.IsKeyDown(Keys.Left))                                                                                              //
-                    turretBone.Transform = Matrix.CreateRotationY(3f * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretBone.Transform;    //
+                    turretRot += 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;    //
                 if (keyboard.IsKeyDown(Keys.Right))                                                                                             //Rotação da torre do tank
-                    turretBone.Transform = Matrix.CreateRotationY(-3f * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretBone.Transform;   //
-
+                    turretRot -= 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
                 if (keyboard.IsKeyDown(Keys.Up))                                                                                                //
-                    cannonRot -= 4;                                                                                                             //
+                    cannonRot -= 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;                                                                                                             //
                 if (keyboard.IsKeyDown(Keys.Down))                                                                                              //Rotação do canhão do tank
-                    cannonRot += 4;                                                                                                             //
+                    cannonRot += 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;                                                                                                             //
                 cannonRot = MathHelper.Clamp(cannonRot, -45, 25);                                                                               //
                 cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;      //
-
+                turretBone.Transform = Matrix.CreateRotationY(turretRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretTransform;
+                
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
                 dustcloud.Update();                                                                                                  //
             }
@@ -202,7 +202,7 @@ namespace TankGame
 
 
 
-        public void fire(ContentManager c)//change position to look like coming from cannon
+        public void Fire(ContentManager c)//change position to look like coming from cannon
         {
             Bullets b = new Bullets(c, pos, terrain, cannonRot, turretTransform * Matrix.CreateRotationY(yaw), tankangle);
             bullets.Add(b);
@@ -229,8 +229,8 @@ namespace TankGame
                     effect.AmbientLightColor = camera.effect.AmbientLightColor;
                 }
                 mesh.Draw();
-                dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
             }
+            dustcloud.DrawCloud(device, camera, terrain.worldMatrix);   
             foreach (Bullets b in bullets)
             {
                 b.Draw(camera);
