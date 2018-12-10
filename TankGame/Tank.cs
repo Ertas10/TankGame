@@ -222,9 +222,25 @@ namespace TankGame
                 turretBone.Transform = Matrix.CreateRotationY(turretRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretTransform;
                 
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-                dustcloud.Update();                                                                                                  //
+                dustcloud.Update();                                                                                                             //
+                if (colisao(pos, otherTank))
+                {
+                    pos -= new Vector3(0.1f, 0.0f, 0.1f);
+                    System.Diagnostics.Debug.WriteLine("a fazer");
+                }
             }
         }
+        public bool colisao(Vector3 pos, Tank tank2)
+        {
+            if (pos.Length() - tank2.pos.Length() < 10)
+            {
+                
+                return true;
+            }
+            System.Diagnostics.Debug.WriteLine("NAO fazer");
+            return false;
+        }
+
 
         public void Fire(ContentManager c)//change position to look like coming from cannon
         {
