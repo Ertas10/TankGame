@@ -19,6 +19,7 @@ namespace TankGame
         ClsPlaneTextureIndexStripVB terrain;
         Tank tank;
         Tank tankAI;
+        CollisionManager colManager;
         List<Tank> enemytanks;
 
         public Game1()
@@ -34,6 +35,7 @@ namespace TankGame
 
         protected override void LoadContent()
         {
+            colManager = new CollisionManager();
             Cls3DAxis = new Cls3DAxis(GraphicsDevice);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             terrain = new ClsPlaneTextureIndexStripVB(GraphicsDevice, 0.2f, Content.Load<Texture2D>("terreno"), Content.Load<Texture2D>("textura"));
@@ -54,6 +56,7 @@ namespace TankGame
             tank.Update(Keyboard.GetState(), gameTime, Content, tankAI, camera);
             camera.Update(Keyboard.GetState(), Mouse.GetState(), gameTime, tank);
             tankAI.Update(Keyboard.GetState(), gameTime, Content, tank, camera);
+            colManager.Collision(tank, tankAI);
 
             base.Update(gameTime);
         }

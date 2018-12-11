@@ -35,6 +35,7 @@ namespace TankGame
         public float cannonRot = 0f;
         public float turretRot = 0f;
         public float tankangle = 0f;
+        public float colRadius = 1.75f;
         GenerateParticle dustcloud;
         public Matrix rotation;
         public Matrix translation;
@@ -76,18 +77,14 @@ namespace TankGame
                 Vector3 sp = new Vector3(0.1f, 0, 0);
                 if ((pos - sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
                 {//limite
-                    
-                        pos -= sp;
-                        dustcloud.CreateCloud(pos, sp);
-                    
+                    pos -= sp;
+                    dustcloud.CreateCloud(pos, sp);
                 }
                 //inimigo pra trás
                 else if ((pos + sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
                 {//limite
-                    
-                        pos += sp;
-                        dustcloud.CreateCloud(pos, sp);
-                    
+                    pos += sp;
+                    dustcloud.CreateCloud(pos, sp);
                 }
                 //inimigo direita
                 if ((Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
@@ -223,33 +220,14 @@ namespace TankGame
                 
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
                 dustcloud.Update();                                                                                                             //
-                if (colisao(pos, otherTank))
-                {
-                    pos -= new Vector3(0.1f, 0.0f, 0.1f);
-                    System.Diagnostics.Debug.WriteLine("a fazer");
-                }
             }
         }
-        public bool colisao(Vector3 pos, Tank tank2)
-        {
-            if (pos.Length() - tank2.pos.Length() < 10)
-            {
-                
-                return true;
-            }
-            System.Diagnostics.Debug.WriteLine("NAO fazer");
-            return false;
-        }
-
 
         public void Fire(ContentManager c)//change position to look like coming from cannon
         {
             Bullets b = new Bullets(c, pos, terrain, cannonRot, turretTransform * Matrix.CreateRotationY(yaw), tankangle);
             bullets.Add(b);
         }
-
-
-
 
         public void Draw(Camera camera, GraphicsDevice device)
         {
@@ -275,11 +253,6 @@ namespace TankGame
             {
                 b.Draw(camera);
             }
-
         }
-
-      
     }
-
-
 }

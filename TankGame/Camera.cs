@@ -56,8 +56,14 @@ namespace TankGame
         }
 
         public void Update(KeyboardState keyboard, MouseState mouse, GameTime gameTime, Tank tank1){
-            if (keyboard.IsKeyDown(Keys.F3)) mode = PlayerMode.CameraSurfaceFollow;
-            if (keyboard.IsKeyDown(Keys.F2)) mode = PlayerMode.CameraFree;
+            if (keyboard.IsKeyDown(Keys.F3)){
+                mode = PlayerMode.CameraSurfaceFollow;
+                Mouse.SetPosition(this.graphicsDevice.Viewport.Width / 2, this.graphicsDevice.Viewport.Height / 2);
+            }
+            if (keyboard.IsKeyDown(Keys.F2)){
+                mode = PlayerMode.CameraFree;
+                Mouse.SetPosition(this.graphicsDevice.Viewport.Width / 2, this.graphicsDevice.Viewport.Height / 2);
+            }
             if (keyboard.IsKeyDown(Keys.F1)) mode = PlayerMode.CameraTank;
             if (mode == PlayerMode.CameraSurfaceFollow)
             {
