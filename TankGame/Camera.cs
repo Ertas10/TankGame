@@ -131,8 +131,8 @@ namespace TankGame
 
                 //primeira coisa a ver é quanto o rato andou , mas apenas sabemos a posição dele, podemos tambem no fim da frame o rato sempre a meio da janela portanto prendemos o rato a meio da janela
                 //neste caso o rato não mexe por isso usamos o device
-                int centroX = graphicsDevice.Viewport.Width / 2
-                    , centroY = graphicsDevice.Viewport.Height / 2;
+                int centroX = graphicsDevice.Viewport.Width / 2;
+                int centroY = graphicsDevice.Viewport.Height / 2;
                 int deltaX = mouse.X - centroX;//é a nova posição do x - o centro do x
                 yaw = yaw - deltaX * escalaRadianosPorPixel;
                 int deltaY = mouse.Y - centroY;
@@ -181,7 +181,7 @@ namespace TankGame
             }
             if (mode == PlayerMode.CameraTank)
             {
-
+                
                 if (keyboard.IsKeyDown(Keys.A))
                 {                                                                                                //
                     yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -194,13 +194,14 @@ namespace TankGame
                 
                 rotacao = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
                 Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotacao);
-                Vector3 cameraTarget = pos + dir;
-                if (teste != true)
-                {
-                    pos = tank1.pos + (viewMatrix.Backward *-5)  + (viewMatrix.Up * 2);
-                    teste = true;
-                }
-                pos = tank1.pos  + (viewMatrix.Up * 2.5f) ;
+                Vector3 cameraTarget = tank1.pos + tank1.dir + new Vector3(0, 3, 0);
+                //if (teste != true)
+                //{
+                //    pos = tank1.pos + (viewMatrix.Backward *-5)  + (viewMatrix.Up * 2);
+                //    teste = true;
+                //}
+                pos = tank1.pos - Vector3.Normalize(tank1.rotation.Backward) * 3f + new Vector3(0, 4, 0);
+                //pos = tank1.pos  + (viewMatrix.Up * 2.5f) + (viewMatrix.Backward * -5);
                 this.viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.Up);
             }
             
