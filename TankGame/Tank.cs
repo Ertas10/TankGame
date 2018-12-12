@@ -39,9 +39,13 @@ namespace TankGame
         GenerateParticle dustcloud;
         public Matrix rotation;
         public Matrix translation;
-        public List<Bullets> bullets;
+        KeyboardState prevKB;
+        List<Keys> keys;
+        public Vector3 dir;
 
-        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode, int ID){
+        public int Id { get => id; }
+
+        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode, int ID, List<Keys> keys){
 
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
             this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
@@ -51,8 +55,7 @@ namespace TankGame
             this.model.CopyAbsoluteBoneTransformsTo(boneTransforms);                                                                        //
             this.terrain = terrain;                                                                                                         //terreno ao qual o tank está "bound"
             this.id = ID;
-            bullets = new List<Bullets>();
-
+            this.keys = keys;
             turretBone = model.Bones["turret_geo"];                                                                                         //bones da turret
             cannonBone = model.Bones["canon_geo"];                                                                                          //bones do canhão
             turretTransform = turretBone.Transform;                                                                                         //bone transforms da turret
@@ -60,18 +63,9 @@ namespace TankGame
             dustcloud = new GenerateParticle(graphicsDevice, pos);
         }
 
-        public void Update(KeyboardState keyboard, GameTime gameTime,  ContentManager content, Tank otherTank, Camera camara)
+        public void Update(KeyboardState keyboard, GameTime gameTime, Tank otherTank, Camera camara, ProjectileManager projMan)
         {
-            for (int i = 0; i < bullets.Count; i++) //each tanks bullets ground or walls
-            {
-                bullets[i].Update(gameTime);
-                //if (bullets[i].HitGround(bullets[i].position, terrain.terreno.Height))
-                //{
-                //    bullets.Remove(bullets[i]);
-                //}
-            }
-
-
+            ChangeMode(keyboard);
             if (mode == PlayerMode.AI){
 
                 Vector3 sp = new Vector3(0.1f, 0, 0);
@@ -106,7 +100,6 @@ namespace TankGame
                 Vector3 normal = ((((int)pos.X + 1) - pos.X) * NAB + (pos.X - ((int)pos.X)) * NCD);             //
                 normal.Normalize();                                                                             //
 
-
                 rotation = Matrix.Identity;
                 Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));                  //
                 dirH.Normalize();                                                                               //
@@ -138,33 +131,31 @@ namespace TankGame
 
                 Matrix translation = Matrix.CreateTranslation(pos);                                             //Translação do tank através da sua posição
 
+                cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;
+                turretBone.Transform = Matrix.CreateRotationY(turretRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretTransform;
+
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
                 dustcloud.Update();                                                                             //
             }
             if (mode == PlayerMode.PC)
             {
-                if (keyboard.IsKeyDown(Keys.Space)){
-                        Fire(content);    
-                }
-
-
-                if (keyboard.IsKeyDown(Keys.A)){                                                                                                //
+                if (keyboard.IsKeyDown(keys[0])){                                                                                                //
                     yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }                                                                                                //Calculo do yaw
-                if (keyboard.IsKeyDown(Keys.D)){                                                                                                //
+                if (keyboard.IsKeyDown(keys[1])){                                                                                                //
                     yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }                                                                                                //
 
                 rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);                                     //Rotação para movimentaçao do tank
 
-                Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
+                dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
                 Vector3 sp = new Vector3(0.1f, 0.01f, 0f);
-                if (keyboard.IsKeyDown(Keys.W)){                                                                                               //
+                if (keyboard.IsKeyDown(keys[2])){                                                                                               //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
                     dustcloud.CreateCloud(pos, sp);
                 }
-                if (keyboard.IsKeyDown(Keys.S)){                                                                                               //
+                if (keyboard.IsKeyDown(keys[3])){                                                                                               //
                     pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //
                     dustcloud.CreateCloud(pos, sp);
                 }
@@ -206,27 +197,37 @@ namespace TankGame
 
                 model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;                      //Atualização da posição, rotação e escala da matriz do tank
 
-                if (keyboard.IsKeyDown(Keys.Left))                                                                                              //
+                if (keyboard.IsKeyDown(keys[5]))                                                                                              //
                    turretRot += 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;    //
-                if (keyboard.IsKeyDown(Keys.Right))                                                                                             //Rotação da torre do tank
+                if (keyboard.IsKeyDown(keys[6]))                                                                                             //Rotação da torre do tank
                     turretRot -= 250 * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
-                if (keyboard.IsKeyDown(Keys.Up))                                                                                                //
+                if (keyboard.IsKeyDown(keys[7]))                                                                                                //
                     cannonRot -= 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;                                                                                                             //
-                if (keyboard.IsKeyDown(Keys.Down))                                                                                              //Rotação do canhão do tank
+                if (keyboard.IsKeyDown(keys[8]))                                                                                              //Rotação do canhão do tank
                     cannonRot += 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;                                                                                                             //
                 cannonRot = MathHelper.Clamp(cannonRot, -45, 25);                                                                               //
                 cannonBone.Transform = Matrix.CreateRotationX(cannonRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * cannonTransform;      //
                 turretBone.Transform = Matrix.CreateRotationY(turretRot * (float)gameTime.ElapsedGameTime.TotalSeconds) * turretTransform;
-                
+
                 model.CopyAbsoluteBoneTransformsTo(boneTransforms);
                 dustcloud.Update();                                                                                                             //
+                if (keyboard.IsKeyDown(keys[4]) && !prevKB.IsKeyDown(keys[4])) {
+                    Vector3 dirShoot = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw + (turretRot * (float)gameTime.ElapsedGameTime.TotalSeconds)));
+                    dirShoot.Normalize();
+                    Vector3 newRight = Vector3.Cross(dirShoot, normal);
+                    newRight.Normalize();
+                    Vector3 newDir = Vector3.Cross(normal, right);
+                    newDir.Normalize();
+                    float shootAngle = MathHelper.ToDegrees((float)Math.Asin(-newDir.Y)) - cannonRot;
+                    Console.WriteLine(dir.ToString());
+                    float y = -0.2f * (float)Math.Tan(MathHelper.ToRadians(cannonRot));
+                    float x = -0.6f * (float)Math.Sin(MathHelper.ToRadians(cannonRot));
+                    float z = -0.6f * (float)Math.Cos(MathHelper.ToRadians(cannonRot));
+                    Console.WriteLine(shootAngle);
+                    projMan.AddProjectile(boneTransforms[model.Bones["canon_geo"].Index].Translation + new Vector3(x, y, 0), dirShoot, shootAngle, id);
+                }
             }
-        }
-
-        public void Fire(ContentManager c)//change position to look like coming from cannon
-        {
-            Bullets b = new Bullets(c, pos, terrain, cannonRot, turretTransform * Matrix.CreateRotationY(yaw), tankangle);
-            bullets.Add(b);
+            prevKB = keyboard;
         }
 
         public void Draw(Camera camera, GraphicsDevice device)
@@ -234,7 +235,7 @@ namespace TankGame
             foreach (ModelMesh mesh in model.Meshes)
             {
                 foreach(BasicEffect effect in mesh.Effects){
-                   // effect.World = worldMatrix;
+                    // effect.World = worldMatrix;
                     effect.World = boneTransforms[mesh.ParentBone.Index];
                     effect.View = camera.viewMatrix;
                     //effect.Projection = camera.projection;
@@ -248,11 +249,16 @@ namespace TankGame
                 }
                 mesh.Draw();
             }
-            dustcloud.DrawCloud(device, camera, terrain.worldMatrix);   
-            foreach (Bullets b in bullets)
-            {
-                b.Draw(camera);
+            dustcloud.DrawCloud(device, camera, terrain.worldMatrix);
+        }
+
+        private void ChangeMode(KeyboardState keyboard){
+            if (keyboard.IsKeyDown(keys[9]) && !prevKB.IsKeyDown(keys[9]) && mode == PlayerMode.AI){
+                mode = PlayerMode.PC;
+                return;
             }
+            if (keyboard.IsKeyDown(keys[9]) && !prevKB.IsKeyDown(keys[9]) && mode == PlayerMode.PC)
+                mode = PlayerMode.AI;
         }
     }
 }
