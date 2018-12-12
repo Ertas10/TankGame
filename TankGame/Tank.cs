@@ -19,6 +19,9 @@ namespace TankGame
         int id;
         PlayerMode mode;
         float Speed = 3f;
+        Vector3 sp;
+        Vector3 spz;
+        Vector3 spy;
         public Vector3 pos;
         Model model;
         ClsPlaneTextureIndexStripVB terrain;
@@ -74,29 +77,6 @@ namespace TankGame
 
             if (mode == PlayerMode.AI){
 
-                Vector3 sp = new Vector3(0.1f, 0, 0);
-                if ((pos - sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {//limite
-                    pos -= sp;
-                    dustcloud.CreateCloud(pos, sp);
-                }
-                //inimigo pra trás
-                else if ((pos + sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {//limite
-                    pos += sp;
-                    dustcloud.CreateCloud(pos, sp);
-                }
-                //inimigo direita
-                if ((Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {
-                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(+0.025f));
-                }
-                //inimigo esquerda
-                else if ((-Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {
-                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(-0.025f));
-                }
-
 
 
                 Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);                           //normais dos pontos onde o tank se encontra
@@ -104,8 +84,7 @@ namespace TankGame
                 Vector3 NAB = ((((int)pos.Z + 1) - pos.Z) * normals[0] + (pos.Z - (int)pos.Z) * normals[1]);    //
                 Vector3 NCD = ((((int)pos.Z + 1) - pos.Z) * normals[2] + (pos.Z - (int)pos.Z) * normals[3]);    //Interpolação das normais
                 Vector3 normal = ((((int)pos.X + 1) - pos.X) * NAB + (pos.X - ((int)pos.X)) * NCD);             //
-                normal.Normalize();                                                                             //
-
+                normal.Normalize();
 
                 rotation = Matrix.Identity;
                 Vector3 dirH = Vector3.Transform(-Vector3.UnitZ, Matrix.CreateRotationY(yaw));                  //
@@ -116,7 +95,50 @@ namespace TankGame
                 dir.Normalize();                                                                                //
                 rotation.Forward = dir;                                                                         //
                 rotation.Up = normal;                                                                           //
-                rotation.Right = right;                                                                         //
+                rotation.Right = right;              
+
+                Matrix teste = rotation * Matrix.CreateTranslation(pos);
+                sp = new Vector3(2f, 0, 0);
+                spz = new Vector3(0, 0, 2f);
+                spy = new Vector3(0, 0.1f, 0f);
+                if (pos.X < otherTank.pos.X)
+                {//limite
+                    pos += sp * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, spy);
+                }
+                //inimigo pra trás
+                 else if (pos.X > otherTank.pos.X)
+                {//limite
+                    pos -= sp * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, spy);
+                }
+                if (pos.Z < otherTank.pos.Z)
+                {//limite
+                    pos += spz * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, spy);
+                }
+                //inimigo pra trás
+                else if (pos.Z > otherTank.pos.Z)
+                {//limite
+                    pos -= spz * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, spy);
+                }
+                //inimigo direita
+                if ((Vector3.Cross(sp, teste.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(+0.025f));
+                }
+                //inimigo esquerda
+                 if ((-Vector3.Cross(sp, teste.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(-0.025f));
+                }
+
+
+
+                //
+
+                //
 
                 if (pos.X < terrain.vertices[0].Position.X)                                                     //
                     pos.X = terrain.vertices[0].Position.X;                                                     //
@@ -149,24 +171,26 @@ namespace TankGame
                 }
 
 
+                rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);                                     //Rotação para movimentaçao do tank
+
+                Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
+                Vector3 sp = new Vector3(0.1f,0.1f,0f);
+                Vector3 a = dir * sp;
                 if (keyboard.IsKeyDown(Keys.A)){                                                                                                //
                     yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(yaw));
                 }                                                                                                //Calculo do yaw
                 if (keyboard.IsKeyDown(Keys.D)){                                                                                                //
                     yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }                                                                                                //
 
-                rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);                                     //Rotação para movimentaçao do tank
-
-                Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
-                Vector3 sp = new Vector3(0.1f, 0.01f, 0f);
                 if (keyboard.IsKeyDown(Keys.W)){                                                                                               //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
-                    dustcloud.CreateCloud(pos, sp);
+                    dustcloud.CreateCloud(pos, a);
                 }
                 if (keyboard.IsKeyDown(Keys.S)){                                                                                               //
                     pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //
-                    dustcloud.CreateCloud(pos, sp);
+                    dustcloud.CreateCloud(pos, -a);
                 }
                 if (pos.X < terrain.vertices[0].Position.X)                                                     //
                     pos.X = terrain.vertices[0].Position.X;                                                     //
