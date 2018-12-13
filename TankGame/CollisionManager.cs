@@ -51,8 +51,11 @@ namespace TankGame
         public bool ProjectileCollision(Projectile proj) {
             if (proj.ParentId != tank1.Id && Vector3.Distance(tank1.pos, proj.pos) < (tank1.colRadius + proj.radius))
                 return true;
+            
+                
             if (proj.ParentId != tank2.Id && Vector3.Distance(tank2.pos, proj.pos) < (tank2.colRadius + proj.radius))
-                return true;
+                if (proj.ParentId != tank1.Id && Vector3.Distance(tank1.pos, proj.pos) < (tank1.colRadius + proj.radius))
+                    return true;
             return false;
         }
     }
