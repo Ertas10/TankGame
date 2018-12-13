@@ -81,47 +81,41 @@ namespace TankGame
 
                 Vector3 right = Vector3.Cross(dir, Vector3.Up);
 
-                if (keyboard.IsKeyDown(Keys.NumPad8))
-                {                                               //
+                if (keyboard.IsKeyDown(Keys.NumPad8))                                               //
+                {                                                                                   //
                     pos = pos + dir * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
                 }                                                                                   //
-                if (keyboard.IsKeyDown(Keys.NumPad5))
-                {                                               //
+                if (keyboard.IsKeyDown(Keys.NumPad5))                                               //
+                {                                                                                   //
                     pos = pos - dir * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;   //
                 }                                                                                   // Controlo de movimento da camara
-                if (keyboard.IsKeyDown(Keys.NumPad4))
-                {                                               //
+                if (keyboard.IsKeyDown(Keys.NumPad4))                                               //
+                {                                                                                   //
                     pos = pos - right * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds; //
                 }                                                                                   //
                 if (keyboard.IsKeyDown(Keys.NumPad6))
-                {                                               //
+                {                                                                                   //
                     pos = pos + right * cameraSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds; //
                 }
-
                 if (pos.X < terreno.vertices[0].Position.X)                                         //
                     pos.X = terreno.vertices[0].Position.X;                                         //
                 if (pos.Z < terreno.vertices[0].Position.Z)                                         //
                     pos.Z = terreno.vertices[0].Position.Z;                                         // Mantém a camara dentro dos limites do terreno
                 if (pos.X > terreno.vertices[terreno.vertices.Length - 1].Position.X)               //
-                    pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 0.0001f;           //
+                    pos.X = terreno.vertices[terreno.vertices.Length - 1].Position.X - 0.0001f;     //
                 if (pos.Z > terreno.vertices[terreno.vertices.Length - 1].Position.Z)               //
-                    pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 0.0001f;           //
+                    pos.Z = terreno.vertices[terreno.vertices.Length - 1].Position.Z - 0.0001f;     //
 
                 Vector3[] vectors = terreno.GetVerticesFromXZ((int)pos.X, (int)pos.Z);              // Vai buscar os vetores que circulam a camara
-
                 float YA = vectors[0].Y;                                                            //
                 float YB = vectors[1].Y;                                                            // Posição Y de cada vetor
                 float YC = vectors[2].Y;                                                            //
                 float YD = vectors[3].Y;                                                            //
-
-
                 float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);          // Interpolação do Y entre A e B
                 float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);          // Interpolação do Y entre C e D
 
-                pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) + 2f;    // Interpolação final para encontrar novo Y da camara, adicionando 2 à altura para não haver clipping
-
+                pos.Y = ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) + 2f;     // Interpolação final para encontrar novo Y da camara, adicionando 2 à altura para não haver clipping
                 target = pos + dir;                                                                 // Atualiza o target
-
                 viewMatrix = Matrix.CreateLookAt(pos, target, Vector3.Up);                          // Atualiza a viewMatrix
 
                 Mouse.SetPosition(centroX, centroY);                                                // Coloca o cursor no centro do ecrã
@@ -179,30 +173,10 @@ namespace TankGame
                 }
 
             }
-            if (mode == PlayerMode.CameraTank)
-            {
-                
-                if (keyboard.IsKeyDown(Keys.A))
-                {                                                                                                //
-                    yaw += 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                }                                                                                                //Calculo do yaw
-                if (keyboard.IsKeyDown(Keys.D))
-                {                                                                                                //
-                    yaw -= 4f * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                }
-                
-                rotacao = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);
-                Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotacao);
-                Vector3 cameraTarget = tank1.pos + tank1.dir + new Vector3(0, 3, 0);
-                //if (teste != true)
-                //{
-                //    pos = tank1.pos + (viewMatrix.Backward *-5)  + (viewMatrix.Up * 2);
-                //    teste = true;
-                //}
-                pos = tank1.pos - Vector3.Normalize(tank1.rotation.Backward) * 3f + new Vector3(0, 4, 0);
-                //pos = tank1.pos  + (viewMatrix.Up * 2.5f) + (viewMatrix.Backward * -5);
-                this.viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.Up);
+            if (mode == PlayerMode.CameraTank){
+                Vector3 cameraTarget = tank1.pos + tank1.dir + new Vector3(0, 3, 0);                                        //target da camara calculado com posição e direção do tank e somado um vector3 para não olhar demasiado para baixo
+                pos = tank1.pos - Vector3.Normalize(tank1.rotation.Backward) * 3f + new Vector3(0, 4, 0);                   //posição da camara calculado com posição da camara e vetor de tras da rotação da mesma, sendo somado um vector3 para a camara nao estar dentro do tank 
+                viewMatrix = Matrix.CreateLookAt(pos, cameraTarget, Vector3.Up);                                       //atualização da viewMatrix
             }
             
             }

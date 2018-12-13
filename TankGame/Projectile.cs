@@ -26,8 +26,6 @@ namespace TankGame
         float hSpeed;
         float dirAngle;
         public float radius;
-        float IvelocityX;
-        float IvelocityY;
         float gravity;
         float force;
 
@@ -51,16 +49,11 @@ namespace TankGame
             this.radius = 0.2f;
             this.gravity = 9.8f;
             this.force = 0.2f;
-            this.IvelocityX = force * MathHelper.ToDegrees((float)Math.Cos(MathHelper.ToRadians(dirAngle)));
-            this.IvelocityY = force * MathHelper.ToDegrees((float)Math.Sin(MathHelper.ToRadians(dirAngle)));
         }
 
         public void Update(GameTime gameTime){
             secondsSinceBirth += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            float velocity = IvelocityX * MathHelper.ToDegrees((float)Math.Sin(MathHelper.ToRadians(dirAngle))) - gravity * secondsSinceBirth;
             totalHeight = force * secondsSinceBirth * MathHelper.ToDegrees((float)Math.Sin(MathHelper.ToRadians(dirAngle))) - (gravity / 2f) * (float)Math.Pow(secondsSinceBirth, 2f);
-            //totalHeight = (float)(velocity * MathHelper.ToDegrees((float)Math.Sin(MathHelper.ToRadians(dirAngle))) * secondsSinceBirth - gravity * Math.Pow(secondsSinceBirth, 2f));
-            //totalHeight = -0.375f * (float)Math.Pow((secondsSinceBirth - 4), 2) + 6;
             pos.X -= dirH.X * hSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * MathHelper.ToDegrees((float)Math.Cos(MathHelper.ToRadians(dirAngle)));
             pos.Z -= dirH.Z * hSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * MathHelper.ToDegrees((float)Math.Cos(MathHelper.ToRadians(dirAngle)));
             pos.Y += totalHeight - prevHeight;
@@ -79,7 +72,7 @@ namespace TankGame
             float YD = vectors[3].Y;                                                                        //Interpolação e calculo da posição no eixo do Y do tank
             float YAB = ((((int)pos.Z + 1) - pos.Z) * YA + (pos.Z - (int)pos.Z) * YB);                      //
             float YCD = ((((int)pos.Z + 1) - pos.Z) * YC + (pos.Z - (int)pos.Z) * YD);                      //
-            if (pos.Y <= ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD))
+            if (pos.Y <= ((((int)pos.X + 1) - pos.X) * YAB + (pos.X - ((int)pos.X)) * YCD) || secondsSinceBirth >= 10)
                 dead = true;
              
         }
