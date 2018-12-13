@@ -30,6 +30,7 @@ namespace TankGame
         //Default Transforms
         Matrix cannonTransform;
         Matrix turretTransform;
+        Vector3 sp, spz, spy;
         //Keeps all transforms
         Matrix[] boneTransforms;
         public float cannonRot = 0f;
@@ -42,11 +43,12 @@ namespace TankGame
         KeyboardState prevKB;
         List<Keys> keys;
         public Vector3 dir;
+        public int hp;
 
         public int Id { get => id; }
 
-        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode, int ID, List<Keys> keys){
-
+        public Tank(Model model, ClsPlaneTextureIndexStripVB terrain, Vector3 startingPos, GraphicsDevice graphicsDevice, PlayerMode playermode, int ID, List<Keys> keys, int hp){
+            this.hp = hp;
             this.pos = startingPos;                                                                                                         //posição inicial do tank no terreno
             this.mode = playermode;                                                                                                         //indica se o tank está em modo "AI" ou modo controlado por jogador
             this.model = model;                                                                                                             //modelo do tank
@@ -68,30 +70,6 @@ namespace TankGame
             ChangeMode(keyboard);
             if (mode == PlayerMode.AI){
 
-                Vector3 sp = new Vector3(0.1f, 0, 0);
-                if ((pos - sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {//limite
-                    pos -= sp;
-                    dustcloud.CreateCloud(pos, sp);
-                }
-                //inimigo pra trás
-                else if ((pos + sp - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {//limite
-                    pos += sp;
-                    dustcloud.CreateCloud(pos, sp);
-                }
-                //inimigo direita
-                if ((Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {
-                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(+0.025f));
-                }
-                //inimigo esquerda
-                else if ((-Vector3.Cross(sp, camara.viewMatrix.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
-                {
-                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(-0.025f));
-                }
-
-
 
                 Vector3[] normals = terrain.GetNormalsFromXZ((int)pos.X, (int)pos.Z);                           //normais dos pontos onde o tank se encontra
 
@@ -109,7 +87,51 @@ namespace TankGame
                 dir.Normalize();                                                                                //
                 rotation.Forward = dir;                                                                         //
                 rotation.Up = normal;                                                                           //
-                rotation.Right = right;                                                                         //
+                rotation.Right = right;
+                Matrix teste = rotation * Matrix.CreateTranslation(pos);
+                sp = new Vector3(2f, 0, 0);
+                spz = new Vector3(0, 0, 2f);
+                Vector3 a = dir * sp;
+
+
+
+
+                if (pos.X < otherTank.pos.X)
+                {//limite
+                    pos += sp * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, a);
+                }
+                //inimigo pra trás
+                else if (pos.X > otherTank.pos.X)
+                {//limite
+                    pos -= sp * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, -a);
+                }
+                if (pos.Z < otherTank.pos.Z)
+                {//limite
+                    pos += spz * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, a);
+                }
+                //inimigo pra trás
+                else if (pos.Z > otherTank.pos.Z)
+                {//limite
+                    pos -= spz * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    dustcloud.CreateCloud(pos, -a);
+                }
+                //inimigo direita
+                if ((Vector3.Cross(sp, teste.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(+0.025f));
+                }
+                //inimigo esquerda
+                if ((-Vector3.Cross(sp, teste.Up) + pos - otherTank.pos).Length() < (pos - otherTank.pos).Length())
+                {
+                    sp = Vector3.Transform(sp, Matrix.CreateRotationY(-0.025f));
+                }
+
+
+
+                                                                    //
 
                 if (pos.X < terrain.vertices[0].Position.X)                                                     //
                     pos.X = terrain.vertices[0].Position.X;                                                     //
@@ -150,14 +172,15 @@ namespace TankGame
                 rotation = Matrix.CreateFromYawPitchRoll(yaw, 0, 0);                                     //Rotação para movimentaçao do tank
 
                 dir = Vector3.Transform(-Vector3.UnitZ, rotation);                                      //Vetor de direção do tank a partir da rotação
-                Vector3 sp = new Vector3(0.1f, 0.01f, 0f);
+                sp = new Vector3(0.1f, 0.01f, 0f);
+                Vector3 a = dir * sp;
                 if (keyboard.IsKeyDown(keys[2])){                                                                                               //
                     pos = pos - dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //Movimentação do tank
-                    dustcloud.CreateCloud(pos, sp);
+                    dustcloud.CreateCloud(pos, a);
                 }
                 if (keyboard.IsKeyDown(keys[3])){                                                                                               //
                     pos = pos + dir * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;                     //
-                    dustcloud.CreateCloud(pos, sp);
+                    dustcloud.CreateCloud(pos, -a);
                 }
                 if (pos.X < terrain.vertices[0].Position.X)                                                     //
                     pos.X = terrain.vertices[0].Position.X;                                                     //
