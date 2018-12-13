@@ -69,8 +69,8 @@ namespace TankGame
             terrain = new ClsPlaneTextureIndexStripVB(GraphicsDevice, 0.2f, Content.Load<Texture2D>("terreno"), Content.Load<Texture2D>("textura"));
             projManager = new ProjectileManager(Content.Load<Model>("rain"), terrain);
             camera = new Camera(GraphicsDevice, terrain);
-            tank = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(15, 15, 15), GraphicsDevice, Tank.PlayerMode.PC, 0, player1Keys);
-            tankAI = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(90, 90, 90), GraphicsDevice, Tank.PlayerMode.AI, 1, player2Keys);
+            tank = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(15, 15, 15), GraphicsDevice, Tank.PlayerMode.PC, 0, player1Keys, 100);
+            tankAI = new Tank(Content.Load<Model>("tank"), terrain, new Vector3(90, 90, 90), GraphicsDevice, Tank.PlayerMode.AI, 1, player2Keys, 100);
             colManager = new CollisionManager(tank, tankAI);
         }
 
