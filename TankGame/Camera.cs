@@ -73,7 +73,7 @@ namespace TankGame
                 int deltaX = mouse.X - centroX;
                 int deltaY = mouse.Y - centroY;
                 yaw = yaw - deltaX * escalaRadianosPorPixel;
-                pitch = pitch - deltaY * escalaRadianosPorPixel;
+                pitch = pitch + deltaY * escalaRadianosPorPixel;
                 pitch = MathHelper.Clamp(pitch, -1, 1);
                 Matrix rotacao = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
 
@@ -130,7 +130,7 @@ namespace TankGame
                 int deltaX = mouse.X - centroX;//é a nova posição do x - o centro do x
                 yaw = yaw - deltaX * escalaRadianosPorPixel;
                 int deltaY = mouse.Y - centroY;
-                pitch += deltaY * escalaRadianosPorPixel;
+                pitch -= deltaY * escalaRadianosPorPixel;
                 pitch = MathHelper.Clamp(pitch, -1, 1);
                 Matrix rotacao = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);   //criar uma rotação
                 Vector3 dir = Vector3.Transform(Vector3.UnitZ/*é um vetor base ,direção inicial olhar para frente*/, rotacao/*vetor rotação*/);//transformar vetor base(naão a yaw nem pitch) com a rotação

@@ -22,7 +22,7 @@ namespace TankGame
             {
                 float tangent = (float)(Math.Sqrt(Math.Pow(tank1.pos.X - tank2.pos.X, 2f)) / Math.Sqrt(Math.Pow(tank1.pos.Z - tank2.pos.Z, 2f)));       //tangente para encontrar o angulo
                 float angle1 = (float)Math.Atan(tangent);                                                                                               //angulo, em radianos, a partir de tangent
-                float hypotenuse = (float)Math.Sqrt(Math.Pow(Vector3.Distance(tank1.pos, tank2.pos) - (tank1.colRadius + tank2.colRadius), 2));         //hipotenusa para calcular movX e movZ
+                float hypotenuse = (float)Math.Sqrt(Math.Pow(Vector3.Distance(tank1.pos, tank2.pos) - (tank1.colRadius + tank2.colRadius), 2f)) / 2f;   //hipotenusa para calcular movX e movZ
                 float movX = (float)(Math.Sin(angle1) * hypotenuse);                                                                                    //movimento que será aplicado no x para não colidir os tanks
                 float movZ = (float)(Math.Cos(angle1) * hypotenuse);                                                                                    //movimento que será aplicado no z para não colidir os tanks
                 if (tank1.pos.X < tank2.pos.X){
