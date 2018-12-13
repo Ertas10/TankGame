@@ -77,14 +77,14 @@ namespace TankGame
                 yaw = (float)((2 * Math.PI) - (yaw - (2 * Math.PI * -div)));
             }
             if (mode == PlayerMode.AI){
-                float cos = (pos.X - otherTank.pos.X) / Vector3.Distance(pos, otherTank.pos);
+                float cos = (pos.Z - otherTank.pos.Z) / Vector3.Distance(pos, otherTank.pos);
                 float angle = (float)Math.Acos(cos);
                     
                 if(angle - yaw < (yaw + 2 * (Math.PI)) - angle){
                     yaw += angle - yaw;
                 }
                 else{
-                    yaw -= ((float)(yaw + 2 * Math.PI) - angle) + MathHelper.ToRadians(180);
+                    yaw -= ((float)(yaw + 2 * Math.PI) - angle);
                 }
                 
                 Vector3 dir = Vector3.Transform(-Vector3.UnitZ, rotation);
